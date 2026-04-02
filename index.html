@@ -3,333 +3,887 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Punchi Battle - La plateforme de battles de punchlines">
-    <meta name="author" content="SP Team - Punchi Battle">
-    <title>Punchi Battle | L'Arène des MCs</title>
+    <title>Punchi Battle | L'Arène des Mots</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;600;800&family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     
-    <!-- Styles -->
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/animations.css">
-    <link rel="stylesheet" href="css/responsive.css">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎤</text></svg>">
+    <style>
+        :root {
+            --primary: #ff3e3e;
+            --primary-dark: #d63030;
+            --secondary: #1a1a2e;
+            --accent: #16213e;
+            --gold: #ffd700;
+            --text: #eaeaea;
+            --text-muted: #a0a0a0;
+            --surface: #0f0f1a;
+            --card: #1e1e2f;
+            --gradient: linear-gradient(135deg, #ff3e3e 0%, #ff6b6b 50%, #ff8e53 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--surface);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse at 20% 80%, rgba(255, 62, 62, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(255, 107, 107, 0.1) 0%, transparent 50%),
+                var(--surface);
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Header */
+        header {
+            padding: 2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(15, 15, 26, 0.8);
+            border-bottom: 1px solid rgba(255, 62, 62, 0.2);
+        }
+
+        .logo {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .logo h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .logo span {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            transition: color 0.3s ease;
+            padding: 0.5rem 0;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--text);
+        }
+
+        nav a:hover::after, nav a.active::after {
+            width: 100%;
+        }
+
+        /* Main Container */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 5%;
+        }
+
+        /* Theme Section */
+        .theme-section {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 3rem;
+            background: var(--card);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 62, 62, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-section::before {
+            content: '🔥';
+            position: absolute;
+            font-size: 15rem;
+            opacity: 0.05;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .theme-label {
+            font-size: 0.9rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .theme-text {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 4rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 20px rgba(255, 62, 62, 0.3)); }
+            to { filter: drop-shadow(0 0 40px rgba(255, 62, 62, 0.6)); }
+        }
+
+        /* Battle Section */
+        .battle-section {
+            margin-bottom: 4rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            letter-spacing: 2px;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: blink 1s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .battle-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .battle-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .battle-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 62, 62, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .battle-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-author {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .author-info h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .author-info span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .punchline {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            font-weight: 300;
+            font-style: italic;
+            color: var(--text);
+            position: relative;
+            padding-left: 1.5rem;
+            border-left: 3px solid var(--primary);
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .vote-count {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .vote-count span {
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .vote-btn {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .vote-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 62, 62, 0.4);
+        }
+
+        .vote-btn.voted {
+            background: var(--gold);
+            border-color: var(--gold);
+            color: var(--secondary);
+        }
+
+        /* Participation Section */
+        .participate-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 4rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .participate-section::after {
+            content: '✍️';
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            font-size: 4rem;
+            opacity: 0.1;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            background: var(--surface);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(255, 62, 62, 0.2);
+        }
+
+        .input-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: var(--gradient);
+            border: none;
+            color: white;
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 62, 62, 0.4);
+        }
+
+        .message {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .message.success {
+            display: block;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #4ade80;
+        }
+
+        .message.error {
+            display: block;
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #f87171;
+        }
+
+        /* Leaderboard */
+        .leaderboard-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .leaderboard-list {
+            list-style: none;
+            margin-top: 2rem;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .leaderboard-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+        }
+
+        .rank {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            width: 50px;
+            text-align: center;
+        }
+
+        .rank.gold { color: var(--gold); }
+        .rank.silver { color: #c0c0c0; }
+        .rank.bronze { color: #cd7f32; }
+
+        .leader-info {
+            flex: 1;
+        }
+
+        .leader-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .leader-info p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .wins {
+            background: var(--gradient);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 5%;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        footer span {
+            color: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1.5rem;
+                padding: 1.5rem;
+            }
+
+            nav {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .theme-text {
+                font-size: 2.5rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+
+        /* Animations on scroll */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+    </style>
 </head>
 
 <body>
-    <!-- Background Effects -->
-    <div class="noise-overlay"></div>
-    <div class="gradient-orb orb-1"></div>
-    <div class="gradient-orb orb-2"></div>
-    <div class="grid-bg"></div>
+    <div class="bg-animation"></div>
 
     <!-- HEADER -->
-    <header class="main-header">
-        <div class="header-brand">
-            <div class="logo-container">
-                <span class="logo-icon">⚡</span>
-                <div class="logo-text">
-                    <h1>PUNCHI BATTLE</h1>
-                    <span class="tagline">L'Arène Officielle des Punchlines</span>
-                </div>
-            </div>
-            <div class="team-badge">
-                <span class="badge-label">By</span>
-                <span class="badge-team">SP TEAM</span>
-            </div>
+    <header>
+        <div class="logo">
+            <h1>Punchi Battle</h1>
+            <span>L'Arène des Mots</span>
         </div>
-
-        <nav class="main-nav">
-            <a href="#accueil" class="nav-link active" data-section="accueil">
-                <span class="nav-icon">🏠</span>
-                <span class="nav-text">Accueil</span>
-            </a>
-            <a href="#battle" class="nav-link" data-section="battle">
-                <span class="nav-icon">⚔️</span>
-                <span class="nav-text">Battle</span>
-                <span class="live-pulse">LIVE</span>
-            </a>
-            <a href="#classement" class="nav-link" data-section="classement">
-                <span class="nav-icon">🏆</span>
-                <span class="nav-text">Classement</span>
-            </a>
-            <a href="#artistes" class="nav-link" data-section="artistes">
-                <span class="nav-icon">🎤</span>
-                <span class="nav-text">Artistes</span>
-            </a>
-            <a href="#profil" class="nav-link" data-section="profil">
-                <span class="nav-icon">👤</span>
-                <span class="nav-text">Profil</span>
-            </a>
+        
+        <nav>
+            <a href="#" class="active">Accueil</a>
+            <a href="#">Battles</a>
+            <a href="#">Classement</a>
+            <a href="#">Profil</a>
         </nav>
-
-        <div class="header-actions">
-            <button class="btn-icon" id="notif-btn" title="Notifications">
-                <span class="icon">🔔</span>
-                <span class="badge-count">3</span>
-            </button>
-            <button class="btn-primary" id="connect-btn">
-                <span>Connexion</span>
-            </button>
-        </div>
-
-        <button class="mobile-menu-btn" id="mobile-menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
     </header>
 
-    <!-- MAIN CONTENT -->
-    <main class="app-container">
-        
-        <!-- SECTION: HERO / ACCUEIL -->
-        <section id="accueil" class="section hero-section active">
-            <div class="hero-content">
-                <div class="hero-badge">🔥 Battle en cours</div>
-                <h2 class="hero-title">
-                    Quand les <span class="highlight">mots</span> deviennent des 
-                    <span class="highlight gradient-text">armes</span>
+    <!-- MAIN -->
+    <main>
+        <!-- THEME -->
+        <section class="theme-section fade-in">
+            <div class="theme-label">Thème du Jour</div>
+            <h2 class="theme-text" id="theme-text">La Trahison</h2>
+        </section>
+
+        <!-- BATTLE -->
+        <section class="battle-section fade-in delay-1">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span>⚔️</span>
+                    Battle en Cours
                 </h2>
-                <p class="hero-subtitle">
-                    Rejoins la première plateforme de battles de punchlines. 
-                    Écris, vote, domine. Deviens la légende du rap game.
-                </p>
-                
-                <div class="hero-stats">
-                    <div class="stat-item">
-                        <span class="stat-number" id="total-battles">1,247</span>
-                        <span class="stat-label">Battles</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" id="total-mcs">8,532</span>
-                        <span class="stat-label">MCs</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" id="total-votes">45.2K</span>
-                        <span class="stat-label">Votes</span>
-                    </div>
-                </div>
-
-                <div class="hero-cta">
-                    <button class="btn-glow btn-large" onclick="scrollToBattle()">
-                        <span>Participer au Battle</span>
-                        <span class="btn-arrow">→</span>
-                    </button>
-                    <button class="btn-outline btn-large">
-                        <span>Voir les Règles</span>
-                    </button>
+                <div class="live-indicator">
+                    <span class="live-dot"></span>
+                    En Direct
                 </div>
             </div>
 
-            <div class="hero-visual">
-                <div class="vinyl-record">
-                    <div class="vinyl-grooves"></div>
-                    <div class="vinyl-label">
-                        <span>PB</span>
-                    </div>
-                    <div class="tonearm"></div>
-                </div>
-                <div class="floating-punchlines">
-                    <span class="float-text" style="--delay:0s">"La rue m'a façonné"</span>
-                    <span class="float-text" style="--delay:1s">"J'crache du feu"</span>
-                    <span class="float-text" style="--delay:2s">"Rimes tranchantes"</span>
-                </div>
+            <div class="cards-grid" id="cards-container">
+                <!-- Cards will be generated by JS -->
             </div>
         </section>
 
-        <!-- SECTION: THEME DU JOUR -->
-        <section class="section theme-banner">
-            <div class="theme-container">
-                <div class="theme-header">
-                    <span class="theme-icon">🎯</span>
-                    <span class="theme-label">Thème du Jour</span>
-                    <span class="theme-timer" id="theme-timer">04:23:15</span>
-                </div>
-                <h3 class="theme-title" id="current-theme">LA TRAHISON</h3>
-                <p class="theme-desc">Les loyautés testées, les masques tombés. Montre-nous ta vision de la trahison.</p>
-                <div class="theme-meta">
-                    <span><strong>142</strong> punchlines soumises</span>
-                    <span><strong>8,234</strong> votes enregistrés</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION: BATTLE -->
-        <section id="battle" class="section battle-section">
-            <div class="section-header">
-                <div class="header-title">
-                    <h2>⚔️ Battle en Cours</h2>
-                    <span class="live-indicator">
-                        <span class="pulse-dot"></span>
-                        En direct
-                    </span>
-                </div>
-                <div class="battle-filters">
-                    <button class="filter-btn active" data-filter="trending">🔥 Tendance</button>
-                    <button class="filter-btn" data-filter="recent">⏰ Récent</button>
-                    <button class="filter-btn" data-filter="top">⭐ Top Votes</button>
-                </div>
-            </div>
-
-            <div class="battle-grid" id="battle-grid">
-                <!-- Cards injectées par JS -->
-            </div>
-
-            <button class="load-more-btn" id="load-more">
-                <span>Charger plus de punchlines</span>
-            </button>
-        </section>
-
-        <!-- SECTION: PARTICIPATION -->
-        <section class="section participate-section">
-            <div class="participate-card">
-                <div class="participate-header">
-                    <h2>✍️ Ta Punchline</h2>
-                    <span class="char-count"><span id="char-current">0</span>/280</span>
-                </div>
-                
-                <div class="participate-form">
-                    <div class="input-row">
-                        <div class="input-group">
-                            <label for="rapper-name">Ton blaze</label>
-                            <input type="text" id="rapper-name" placeholder="Ex: Lil Shadow, MC Flow..." maxlength="20">
-                        </div>
-                        <div class="input-group">
-                            <label for="rapper-style">Style</label>
-                            <select id="rapper-style">
-                                <option value="hardcore">Hardcore</option>
-                                <option value="conscious">Conscient</option>
-                                <option value="melodic">Mélodique</option>
-                                <option value="trap">Trap</option>
-                                <option value="oldschool">Old School</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label for="punchline-text">Écris ta punchline sur le thème</label>
-                        <textarea id="punchline-text" placeholder="Balance ta meilleure punchline... Fais mouche !" maxlength="280" rows="3"></textarea>
-                        <div class="textarea-tools">
-                            <button class="tool-btn" title="Ajouter un hashtag">#</button>
-                            <button class="tool-btn" title="Citer un artiste">@</button>
-                        </div>
-                    </div>
-
-                    <div class="form-actions">
-                        <button class="btn-secondary" onclick="previewPunchline()">
-                            👁️ Prévisualiser
-                        </button>
-                        <button class="btn-glow btn-submit" onclick="submitPunchline()">
-                            🚀 Poster ma Punchline
-                        </button>
-                    </div>
-
-                    <div id="submit-message" class="form-message"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION: CLASSEMENT -->
-        <section id="classement" class="section ranking-section">
-            <div class="section-header">
-                <h2>🏆 Hall of Fame</h2>
-                <div class="ranking-tabs">
-                    <button class="tab-btn active" data-tab="daily">Aujourd'hui</button>
-                    <button class="tab-btn" data-tab="weekly">Cette semaine</button>
-                    <button class="tab-btn" data-tab="monthly">Mois</button>
-                    <button class="tab-btn" data-tab="alltime">All Time</button>
-                </div>
-            </div>
-
-            <div class="ranking-podium" id="ranking-podium">
-                <!-- Top 3 généré par JS -->
-            </div>
-
-            <div class="ranking-list" id="ranking-list">
-                <!-- Liste générée par JS -->
-            </div>
-        </section>
-
-        <!-- SECTION: ARTISTES -->
-        <section id="artistes" class="section artists-section">
-            <div class="section-header">
-                <h2>🎤 Artistes SP Team</h2>
-                <p>Les membres fondateurs de la plateforme</p>
-            </div>
+        <!-- PARTICIPATE -->
+        <section class="participate-section fade-in delay-2">
+            <h2 class="section-title">
+                <span>✍️</span>
+                Rejoins le Combat
+            </h2>
             
-            <div class="artists-grid" id="artists-grid">
-                <!-- Profils artistes générés par JS -->
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="pseudo">Ton Nom de Guerrier</label>
+                    <input type="text" id="pseudo" placeholder="Ex: Shadow, Morningstarr...">
+                </div>
+                
+                <div class="input-group">
+                    <label for="texte">Ta Punchline</label>
+                    <textarea id="texte" placeholder="Écris quelque chose qui frappe..."></textarea>
+                </div>
+                
+                <button class="submit-btn" onclick="envoyer()">Poster ma Punchline</button>
+                <div id="message" class="message"></div>
             </div>
         </section>
 
-        <!-- SECTION: PROFIL (caché par défaut) -->
-        <section id="profil" class="section profile-section hidden">
-            <div class="profile-header">
-                <div class="profile-avatar">
-                    <span>?</span>
-                </div>
-                <div class="profile-info">
-                    <h2>Connecte-toi</h2>
-                    <p>Rejoins la communauté pour sauvegarder tes stats et participer aux battles</p>
-                    <button class="btn-glow">Connexion / Inscription</button>
-                </div>
-            </div>
+        <!-- LEADERBOARD -->
+        <section class="leaderboard-section fade-in delay-3">
+            <h2 class="section-title">
+                <span>🏆</span>
+                Hall of Fame
+            </h2>
+            
+            <ul class="leaderboard-list" id="leaderboard">
+                <!-- Generated by JS -->
+            </ul>
         </section>
-
     </main>
 
     <!-- FOOTER -->
-    <footer class="main-footer">
-        <div class="footer-content">
-            <div class="footer-brand">
-                <h3>PUNCHI BATTLE</h3>
-                <p>La plateforme de référence pour les battles de punchlines.</p>
-                <div class="social-links">
-                    <a href="#" class="social-link">📸 Instagram</a>
-                    <a href="#" class="social-link">🐦 Twitter</a>
-                    <a href="#" class="social-link">📺 YouTube</a>
-                    <a href="#" class="social-link">💬 Discord</a>
-                </div>
-            </div>
-            
-            <div class="footer-links">
-                <div class="link-group">
-                    <h4>Plateforme</h4>
-                    <a href="#">Comment ça marche</a>
-                    <a href="#">Règles du jeu</a>
-                    <a href="#">FAQ</a>
-                </div>
-                <div class="link-group">
-                    <h4>Communauté</h4>
-                    <a href="#">Discord SP Team</a>
-                    <a href="#">Événements</a>
-                    <a href="#">Partenaires</a>
-                </div>
-                <div class="link-group">
-                    <h4>Légal</h4>
-                    <a href="#">CGU</a>
-                    <a href="#">Confidentialité</a>
-                    <a href="#">Contact</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="footer-bottom">
-            <p>© 2026 Punchi Battle — Propulsé par <strong>SP Team</strong> 🎵</p>
-            <p class="credits">Conçu avec 🔥 pour la culture hip-hop</p>
-        </div>
+    <footer>
+        <p>© 2026 <span>Punchi Battle</span> — Tous droits réservés</p>
     </footer>
 
-    <!-- Scripts -->
-    <script src="js/app.js"></script>
-    <script src="js/battles.js"></script>
-    <script src="js/voting.js"></script>
-    <script src="js/users.js"></script>
+    <script>
+        // Data
+        const punchlines = [
+            {
+                id: 1,
+                author: "Morning_Starr",
+                avatar: "M",
+                text: "J'ai serré des mains qui cachaient des couteaux.",
+                votes: 527,
+                time: "2 min"
+            },
+            {
+                id: 2,
+                author: "LyricKiller",
+                avatar: "L",
+                text: "Ils parlaient d'amour mais visaient mon dos.",
+                votes: 98,
+                time: "5 min"
+            },
+            {
+                id: 3,
+                author: "StreetPoet",
+                avatar: "S",
+                text: "La loyauté coûte cher, les traîtres sont gratuits.",
+                votes: 156,
+                time: "8 min"
+            },
+            {
+                id: 4,
+                author: "FlowMaster",
+                avatar: "F",
+                text: "Les sourires les plus beaux cachent les âmes les plus brisées.",
+                votes: 84,
+                time: "12 min"
+            }
+        ];
+
+        const leaderboard = [
+            { rank: 1, name: "Morning_Starr", wins: 255, trend: "up" },
+            { rank: 2, name: "Big thug", wins: 250, trend: "stable" },
+            { rank: 3, name: "Shadow", wins: 205, trend: "up" },
+            { rank: 4, name: "NightWolf", wins: 194, trend: "down" },
+            { rank: 5, name: "LyricKiller", wins: 163, trend: "up" }
+        ];
+
+        let userVotes = new Set();
+
+        // Render Cards
+        function renderCards() {
+            const container = document.getElementById('cards-container');
+            container.innerHTML = punchlines.map(p => `
+                <div class="battle-card" data-id="${p.id}">
+                    <div class="card-author">
+                        <div class="avatar">${p.avatar}</div>
+                        <div class="author-info">
+                            <h4>${p.author}</h4>
+                            <span>Il y a ${p.time}</span>
+                        </div>
+                    </div>
+                    <p class="punchline">"${p.text}"</p>
+                    <div class="card-actions">
+                        <div class="vote-count">
+                            <span>${p.votes}</span> votes
+                        </div>
+                        <button class="vote-btn ${userVotes.has(p.id) ? 'voted' : ''}" onclick="vote(${p.id})">
+                            ${userVotes.has(p.id) ? '✓ Voté' : '🔥 Voter'}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render Leaderboard
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboard');
+            const rankClasses = ['gold', 'silver', 'bronze'];
+            
+            container.innerHTML = leaderboard.map((l, i) => `
+                <li class="leaderboard-item">
+                    <div class="rank ${rankClasses[i] || ''}">#${l.rank}</div>
+                    <div class="leader-info">
+                        <h3>${l.name}</h3>
+                        <p>${l.wins} victoires • Tendance ${l.trend}</p>
+                    </div>
+                    <div class="wins">${l.wins} 🏆</div>
+                </li>
+            `).join('');
+        }
+
+        // Vote Function
+        function vote(id) {
+            const card = punchlines.find(p => p.id === id);
+            const btn = document.querySelector(`[data-id="${id}"] .vote-btn`);
+            
+            if (userVotes.has(id)) {
+                // Unvote
+                userVotes.delete(id);
+                card.votes--;
+            } else {
+                // Vote
+                userVotes.add(id);
+                card.votes++;
+                
+                // Animation effect
+                btn.style.transform = 'scale(1.2)';
+                setTimeout(() => btn.style.transform = 'scale(1)', 200);
+            }
+            
+            renderCards();
+        }
+
+        // Submit Function
+        function envoyer() {
+            const pseudo = document.getElementById('pseudo').value.trim();
+            const texte = document.getElementById('texte').value.trim();
+            const message = document.getElementById('message');
+            
+            if (!pseudo || !texte) {
+                message.className = 'message error';
+                message.textContent = 'Remplis tous les champs, guerrier !';
+                return;
+            }
+            
+            if (texte.length < 10) {
+                message.className = 'message error';
+                message.textContent = 'Ta punchline est trop courte pour faire mal...';
+                return;
+            }
+            
+            // Add new punchline
+            const newPunchline = {
+                id: punchlines.length + 1,
+                author: pseudo,
+                avatar: pseudo[0].toUpperCase(),
+                text: texte,
+                votes: 0,
+                time: "À l'instant"
+            };
+            
+            punchlines.unshift(newPunchline);
+            renderCards();
+            
+            // Reset form
+            document.getElementById('pseudo').value = '';
+            document.getElementById('texte').value = '';
+            
+            message.className = 'message success';
+            message.textContent = 'Ta punchline est en lice ! Que le meilleur gagne. 🔥';
+            
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 3000);
+        }
+
+        // Initialize
+        renderCards();
+        renderLeaderboard();
+
+        // Random theme rotation (demo)
+        const themes = ["La Trahison", "L'Ambition", "La Rue", "L'Amour Perdu", "La Victoire"];
+        let themeIndex = 0;
+        
+        setInterval(() => {
+            themeIndex = (themeIndex + 1) % themes.length;
+            document.getElementById('theme-text').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('theme-text').textContent = themes[themeIndex];
+                document.getElementById('theme-text').style.opacity = '1';
+            }, 300);
+        }, 10000);
+    </script>
 </body>
 </html>
