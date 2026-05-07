@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Punchi Battle | L'Arène des Mots</title>
     
+    <!-- Favicon / Icône d'onglet -->
+    <link rel="icon" type="image/png" href="https://kimi-web-img.moonshot.cn/img/t4.ftcdn.net/eed7dce7c540a9223bf6612b54d1200f48d0d720.jpg">
+    <link rel="shortcut icon" type="image/png" href="https://kimi-web-img.moonshot.cn/img/t4.ftcdn.net/eed7dce7c540a9223bf6612b54d1200f48d0d720.jpg">
+    
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -302,15 +306,12 @@
         }
 
         .avatar {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
-            background: var(--gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 1rem;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 10px rgba(255, 62, 62, 0.3);
         }
 
         .author-info h4 {
@@ -715,12 +716,12 @@
     </footer>
 
     <script>
-        // Data
+        // Data avec l'image de Morgan
         const punchlines = [
             {
                 id: 1,
-                author: "Morning_Starr",
-                avatar: "N",
+                author: "Morgan",
+                avatar: "/mnt/agents/upload/jojo.jpg",
                 text: "J'ai serré des mains qui cachaient des couteaux.",
                 votes: 727,
                 time: "2 min"
@@ -728,7 +729,7 @@
             {
                 id: 2,
                 author: "LyricKiller",
-                avatar: "L",
+                avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
                 text: "Ils parlaient d'amour mais visaient mon dos.",
                 votes: 298,
                 time: "5 min"
@@ -736,7 +737,7 @@
             {
                 id: 3,
                 author: "StreetPoet",
-                avatar: "S",
+                avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
                 text: "La loyauté coûte cher, les traîtres sont gratuits.",
                 votes: 156,
                 time: "8 min"
@@ -744,7 +745,7 @@
             {
                 id: 4,
                 author: "FlowMaster",
-                avatar: "F",
+                avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop",
                 text: "Les sourires les plus beaux cachent les âmes les plus brisées.",
                 votes: 84,
                 time: "12 min"
@@ -752,7 +753,7 @@
         ];
 
         const leaderboard = [
-            { rank: 1, name: "Morning_Starr", wins: 350, trend: "up" },
+            { rank: 1, name: "Morgan", wins: 350, trend: "up" },
             { rank: 2, name: "Big_Thug", wins: 229, trend: "stable" },
             { rank: 3, name: "Shadow", wins: 155, trend: "up" },
             { rank: 4, name: "NightWolf", wins: 142, trend: "down" },
@@ -767,7 +768,7 @@
             container.innerHTML = punchlines.map(p => `
                 <div class="battle-card" data-id="${p.id}">
                     <div class="card-author">
-                        <div class="avatar">${p.avatar}</div>
+                        <img src="${p.avatar}" alt="${p.author}" class="avatar">
                         <div class="author-info">
                             <h4>${p.author}</h4>
                             <span>Il y a ${p.time}</span>
@@ -847,7 +848,7 @@
             const newPunchline = {
                 id: punchlines.length + 1,
                 author: pseudo,
-                avatar: pseudo[0].toUpperCase(),
+                avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${pseudo}`,
                 text: texte,
                 votes: 0,
                 time: "À l'instant"
@@ -873,7 +874,7 @@
         renderLeaderboard();
 
         // Random theme rotation (demo)
-        const themes = ["La Trahison", "L'Ambition", "La Rue", "L'Amour Perdu", "La Victoire""I am 242"];
+        const themes = ["La Trahison", "L'Ambition", "La Rue", "L'Amour Perdu", "La Victoire"];
         let themeIndex = 0;
         
         setInterval(() => {
