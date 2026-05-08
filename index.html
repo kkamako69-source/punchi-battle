@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Punchi Battle | L'Arène des Mots</title>
     
-    <!-- Favicon / Icône d'onglet -->
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="https://kimi-web-img.moonshot.cn/img/t4.ftcdn.net/eed7dce7c540a9223bf6612b54d1200f48d0d720.jpg">
     <link rel="shortcut icon" type="image/png" href="https://kimi-web-img.moonshot.cn/img/t4.ftcdn.net/eed7dce7c540a9223bf6612b54d1200f48d0d720.jpg">
     
@@ -77,7 +77,7 @@
 
         /* Header */
         header {
-            padding: 2rem 5%;
+            padding: 1.5rem 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -85,11 +85,27 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(15, 15, 26, 0.8);
-            border-bottom: 1px solid rgba(255, 62, 62, 0.2);
+            background: rgba(15, 15, 26, 0.9);
+            border-bottom: 1px solid rgba(255, 62, 62, 0.3);
         }
 
         .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+        }
+
+        .logo-img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 15px rgba(255, 62, 62, 0.4);
+        }
+
+        .logo-text {
             display: flex;
             flex-direction: column;
             gap: 0.25rem;
@@ -97,7 +113,7 @@
 
         .logo h1 {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 2.5rem;
+            font-size: 2rem;
             background: var(--gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -107,7 +123,7 @@
         }
 
         .logo span {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
             font-weight: 300;
             letter-spacing: 3px;
@@ -117,57 +133,138 @@
         /* Navigation */
         nav {
             display: flex;
-            gap: 2rem;
+            gap: 1.5rem;
+            align-items: center;
         }
 
-        nav a {
+        .nav-btn {
+            background: transparent;
+            border: none;
             color: var(--text-muted);
-            text-decoration: none;
+            font-family: 'Inter', sans-serif;
             font-weight: 500;
             font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 1px;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
             position: relative;
             transition: color 0.3s ease;
-            padding: 0.5rem 0;
         }
 
-        nav a::after {
+        .nav-btn::after {
             content: '';
             position: absolute;
             bottom: 0;
-            left: 0;
+            left: 50%;
             width: 0;
             height: 2px;
             background: var(--gradient);
-            transition: width 0.3s ease;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
         }
 
-        nav a:hover, nav a.active {
+        .nav-btn:hover, .nav-btn.active {
             color: var(--text);
         }
 
-        nav a:hover::after, nav a.active::after {
+        .nav-btn:hover::after, .nav-btn.active::after {
             width: 100%;
+        }
+
+        /* Back Button */
+        .back-btn {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 62, 62, 0.2);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 62, 62, 0.4);
+        }
+
+        .back-btn.visible {
+            display: flex;
         }
 
         /* Main Container */
         main {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 3rem 5%;
+            padding: 2rem 5%;
+        }
+
+        /* Section Management */
+        .section-view {
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .section-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--gold);
+        }
+
+        .breadcrumb .current {
+            color: var(--text);
         }
 
         /* Theme Section */
         .theme-section {
             text-align: center;
-            margin-bottom: 4rem;
-            padding: 3rem;
+            margin-bottom: 3rem;
+            padding: 4rem 3rem;
             background: var(--card);
             border-radius: 20px;
             border: 1px solid rgba(255, 62, 62, 0.3);
             position: relative;
             overflow: hidden;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .theme-section:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 60px rgba(255, 62, 62, 0.2);
         }
 
         .theme-section::before {
@@ -207,14 +304,88 @@
             animation: glow 2s ease-in-out infinite alternate;
         }
 
+        .theme-subtitle {
+            margin-top: 1rem;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
         @keyframes glow {
             from { filter: drop-shadow(0 0 20px rgba(255, 62, 62, 0.3)); }
             to { filter: drop-shadow(0 0 40px rgba(255, 62, 62, 0.6)); }
         }
 
+        /* Info Cards Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .info-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--gradient);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 62, 62, 0.3);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .info-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .info-card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-card h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .info-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .info-card .stat {
+            font-size: 2rem;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-top: 1rem;
+        }
+
         /* Battle Section */
         .battle-section {
-            margin-bottom: 4rem;
+            margin-bottom: 3rem;
         }
 
         .section-header {
@@ -222,6 +393,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .section-title {
@@ -257,6 +430,32 @@
             50% { opacity: 0.3; }
         }
 
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: var(--card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--gradient);
+            color: white;
+            border-color: transparent;
+        }
+
         /* Cards Grid */
         .cards-grid {
             display: grid;
@@ -275,6 +474,7 @@
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
+            cursor: pointer;
         }
 
         .battle-card::before {
@@ -335,6 +535,13 @@
             border-left: 3px solid var(--primary);
         }
 
+        .card-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
         .card-actions {
             display: flex;
             justify-content: space-between;
@@ -386,12 +593,113 @@
             color: var(--secondary);
         }
 
+        /* Detail View */
+        .detail-view {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 3rem;
+            border: 1px solid rgba(255, 62, 62, 0.2);
+        }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .detail-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            box-shadow: 0 0 30px rgba(255, 62, 62, 0.3);
+        }
+
+        .detail-info h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-info p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .detail-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .detail-stat {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .detail-stat .number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--gold);
+        }
+
+        .detail-stat .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .detail-content {
+            margin-top: 2rem;
+        }
+
+        .detail-content h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+        }
+
+        .comments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .comment {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .comment-text {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
         /* Participation Section */
         .participate-section {
             background: var(--card);
             border-radius: 20px;
             padding: 3rem;
-            margin-bottom: 4rem;
+            margin-bottom: 3rem;
             border: 1px solid rgba(255, 255, 255, 0.05);
             position: relative;
         }
@@ -528,11 +836,13 @@
             padding: 1.5rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .leaderboard-item:hover {
             background: rgba(255, 255, 255, 0.02);
             border-radius: 12px;
+            transform: translateX(10px);
         }
 
         .rank {
@@ -545,6 +855,14 @@
         .rank.gold { color: var(--gold); }
         .rank.silver { color: #c0c0c0; }
         .rank.bronze { color: #cd7f32; }
+
+        .leader-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+        }
 
         .leader-info {
             flex: 1;
@@ -568,6 +886,133 @@
             font-size: 0.9rem;
         }
 
+        /* Profile Section */
+        .profile-header {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 62, 62, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .profile-avatar-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            box-shadow: 0 0 30px rgba(255, 62, 62, 0.3);
+        }
+
+        .profile-info h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+        }
+
+        .profile-info .tag {
+            display: inline-block;
+            background: var(--gradient);
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .profile-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-stat-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .profile-stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .profile-stat-card .icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .profile-stat-card .value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--gold);
+        }
+
+        .profile-stat-card .label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* History List */
+        .history-list {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-rank {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            color: var(--gold);
+            min-width: 50px;
+        }
+
+        .history-content {
+            flex: 1;
+        }
+
+        .history-content h4 {
+            margin-bottom: 0.25rem;
+        }
+
+        .history-content p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .history-date {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
         /* Footer */
         footer {
             text-align: center;
@@ -585,14 +1030,19 @@
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
-                gap: 1.5rem;
-                padding: 1.5rem;
+                gap: 1rem;
+                padding: 1rem;
             }
 
             nav {
-                gap: 1rem;
+                gap: 0.5rem;
                 flex-wrap: wrap;
                 justify-content: center;
+            }
+
+            .nav-btn {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem;
             }
 
             .theme-text {
@@ -608,26 +1058,56 @@
                 gap: 1rem;
                 text-align: center;
             }
-        }
 
-        /* Animations on scroll */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(30px);
-            animation: fadeIn 0.8s ease forwards;
-        }
+            .detail-header {
+                flex-direction: column;
+                text-align: center;
+            }
 
-        @keyframes fadeIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
             }
         }
 
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.2s; }
-        .delay-3 { animation-delay: 0.3s; }
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--surface);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
+<base target="_blank">
 </head>
 
 <body>
@@ -635,29 +1115,96 @@
 
     <!-- HEADER -->
     <header>
-        <div class="logo">
-            <h1>Punchi Battle</h1>
-            <span>L'Arène des Mots</span>
+        <div class="logo" onclick="navigateTo('home')">
+            <img src="https://kimi-web-img.moonshot.cn/img/t4.ftcdn.net/eed7dce7c540a9223bf6612b54d1200f48d0d720.jpg" alt="Punchi Battle" class="logo-img">
+            <div class="logo-text">
+                <h1>Punchi Battle</h1>
+                <span>L'Arène des Mots</span>
+            </div>
         </div>
         
         <nav>
-            <a href="#" class="active">Accueil</a>
-            <a href="#">Battles</a>
-            <a href="#">Classement</a>
-            <a href="#">Profil</a>
+            <button class="nav-btn active" data-section="home" onclick="navigateTo('home')">Accueil</button>
+            <button class="nav-btn" data-section="battles" onclick="navigateTo('battles')">Battles</button>
+            <button class="nav-btn" data-section="classement" onclick="navigateTo('classement')">Classement</button>
+            <button class="nav-btn" data-section="profil" onclick="navigateTo('profil')">Profil</button>
         </nav>
+        
+        <button class="back-btn" id="backBtn" onclick="goBack()">
+            ← Retour
+        </button>
     </header>
 
     <!-- MAIN -->
     <main>
-        <!-- THEME -->
-        <section class="theme-section fade-in">
-            <div class="theme-label">Thème du Jour</div>
-            <h2 class="theme-text" id="theme-text">La Trahison</h2>
-        </section>
+        
+        <!-- ==================== HOME SECTION ==================== -->
+        <div id="section-home" class="section-view active">
+            
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <span>🏠 Accueil</span>
+            </div>
 
-        <!-- BATTLE -->
-        <section class="battle-section fade-in delay-1">
+            <!-- Theme -->
+            <section class="theme-section" onclick="navigateTo('battles')">
+                <div class="theme-label">Thème du Jour</div>
+                <h2 class="theme-text" id="theme-text">La Trahison</h2>
+                <p class="theme-subtitle">Clique pour voir les battles en cours 🔥</p>
+            </section>
+
+            <!-- Info Cards -->
+            <div class="info-grid">
+                <div class="info-card" onclick="navigateTo('battles')">
+                    <div class="info-card-icon">⚔️</div>
+                    <h3>Battles Actifs</h3>
+                    <p>Rejoins les combats de mots en cours et vote pour tes favoris</p>
+                    <div class="stat">12</div>
+                </div>
+                <div class="info-card" onclick="navigateTo('classement')">
+                    <div class="info-card-icon">🏆</div>
+                    <h3>Classement</h3>
+                    <p>Découvre les meilleurs guerriers de l'arène</p>
+                    <div class="stat">Top 50</div>
+                </div>
+                <div class="info-card" onclick="navigateTo('profil')">
+                    <div class="info-card-icon">👤</div>
+                    <h3>Mon Profil</h3>
+                    <p>Gère tes statistiques et ton historique de battles</p>
+                    <div class="stat">Morgan</div>
+                </div>
+                <div class="info-card" onclick="showDetail('regles')">
+                    <div class="info-card-icon">📜</div>
+                    <h3>Règles</h3>
+                    <p>Apprends les règles du jeu pour dominer l'arène</p>
+                    <div class="stat">5</div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <section class="battle-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span>🔥</span>
+                        Activité Récente
+                    </h2>
+                </div>
+                <div class="cards-grid" id="recent-cards">
+                    <!-- Generated by JS -->
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== BATTLES SECTION ==================== -->
+        <div id="section-battles" class="section-view">
+            
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a onclick="navigateTo('home')">Accueil</a>
+                <span>/</span>
+                <span class="current">Battles</span>
+            </div>
+
             <div class="section-header">
                 <h2 class="section-title">
                     <span>⚔️</span>
@@ -669,54 +1216,220 @@
                 </div>
             </div>
 
-            <div class="cards-grid" id="cards-container">
-                <!-- Cards will be generated by JS -->
+            <!-- Filters -->
+            <div class="filters">
+                <button class="filter-btn active" onclick="filterBattles('all')">Tous</button>
+                <button class="filter-btn" onclick="filterBattles('popular')">Populaires</button>
+                <button class="filter-btn" onclick="filterBattles('recent')">Récents</button>
+                <button class="filter-btn" onclick="filterBattles('moi')">Mes Battles</button>
             </div>
-        </section>
 
-        <!-- PARTICIPATE -->
-        <section class="participate-section fade-in delay-2">
-            <h2 class="section-title">
-                <span>✍️</span>
-                Rejoins le Combat
-            </h2>
-            
-            <div class="form-grid">
-                <div class="input-group">
-                    <label for="pseudo">Ton Nom de Guerrier</label>
-                    <input type="text" id="pseudo" placeholder="Ex: Shadow, Morningstarr...">
-                </div>
-                
-                <div class="input-group">
-                    <label for="texte">Ta Punchline</label>
-                    <textarea id="texte" placeholder="Écris quelque chose qui frappe..."></textarea>
-                </div>
-                
-                <button class="submit-btn" onclick="envoyer()">Poster ma Punchline</button>
-                <div id="message" class="message"></div>
-            </div>
-        </section>
-
-        <!-- LEADERBOARD -->
-        <section class="leaderboard-section fade-in delay-3">
-            <h2 class="section-title">
-                <span>🏆</span>
-                Hall of Fame
-            </h2>
-            
-            <ul class="leaderboard-list" id="leaderboard">
+            <div class="cards-grid" id="battles-cards">
                 <!-- Generated by JS -->
-            </ul>
-        </section>
+            </div>
+        </div>
+
+        <!-- ==================== BATTLE DETAIL ==================== -->
+        <div id="section-battle-detail" class="section-view">
+            
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a onclick="navigateTo('home')">Accueil</a>
+                <span>/</span>
+                <a onclick="navigateTo('battles')">Battles</a>
+                <span>/</span>
+                <span class="current" id="detail-breadcrumb">Détail</span>
+            </div>
+
+            <div class="detail-view" id="battle-detail-content">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+
+        <!-- ==================== CLASSEMENT SECTION ==================== -->
+        <div id="section-classement" class="section-view">
+            
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a onclick="navigateTo('home')">Accueil</a>
+                <span>/</span>
+                <span class="current">Classement</span>
+            </div>
+
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span>🏆</span>
+                    Hall of Fame
+                </h2>
+            </div>
+
+            <div class="filters">
+                <button class="filter-btn active" onclick="filterLeaderboard('all')">Global</button>
+                <button class="filter-btn" onclick="filterLeaderboard('week')">Cette Semaine</button>
+                <button class="filter-btn" onclick="filterLeaderboard('month')">Ce Mois</button>
+            </div>
+
+            <section class="leaderboard-section">
+                <ul class="leaderboard-list" id="leaderboard-list">
+                    <!-- Generated by JS -->
+                </ul>
+            </section>
+        </div>
+
+        <!-- ==================== PLAYER DETAIL ==================== -->
+        <div id="section-player-detail" class="section-view">
+            
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a onclick="navigateTo('home')">Accueil</a>
+                <span>/</span>
+                <a onclick="navigateTo('classement')">Classement</a>
+                <span>/</span>
+                <span class="current" id="player-breadcrumb">Profil</span>
+            </div>
+
+            <div id="player-detail-content">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+
+        <!-- ==================== PROFIL SECTION ==================== -->
+        <div id="section-profil" class="section-view">
+            
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a onclick="navigateTo('home')">Accueil</a>
+                <span>/</span>
+                <span class="current">Mon Profil</span>
+            </div>
+
+            <div class="profile-header">
+                <img src="/mnt/agents/upload/jojo.jpg" alt="Morgan" class="profile-avatar-large">
+                <div class="profile-info">
+                    <h2>Morgan</h2>
+                    <p>Légende de l'Arène • Membre depuis 2024</p>
+                    <span class="tag">👑 Champion en Titre</span>
+                </div>
+            </div>
+
+            <div class="profile-stats-grid">
+                <div class="profile-stat-card">
+                    <div class="icon">🏆</div>
+                    <div class="value">350</div>
+                    <div class="label">Victoires</div>
+                </div>
+                <div class="profile-stat-card">
+                    <div class="icon">⚔️</div>
+                    <div class="value">482</div>
+                    <div class="label">Battles</div>
+                </div>
+                <div class="profile-stat-card">
+                    <div class="icon">🔥</div>
+                    <div class="value">12.4K</div>
+                    <div class="label">Votes Reçus</div>
+                </div>
+                <div class="profile-stat-card">
+                    <div class="icon">📈</div>
+                    <div class="value">94%</div>
+                    <div class="label">Taux de Victoire</div>
+                </div>
+            </div>
+
+            <div class="history-list">
+                <h3 style="font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; margin-bottom: 1rem; letter-spacing: 1px;">
+                    <span>📜</span> Historique des Battles
+                </h3>
+                <div id="history-content">
+                    <!-- Generated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== REGLES DETAIL ==================== -->
+        <div id="section-regles" class="section-view">
+            
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a onclick="navigateTo('home')">Accueil</a>
+                <span>/</span>
+                <span class="current">Règles du Jeu</span>
+            </div>
+
+            <div class="detail-view">
+                <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; letter-spacing: 2px; margin-bottom: 2rem;">
+                    📜 Règles de Punchi Battle
+                </h2>
+                
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div class="comment">
+                        <div class="comment-author">Règle 1 — Le Thème</div>
+                        <div class="comment-text">Chaque jour, un nouveau thème est proposé. Les participants doivent créer une punchline en rapport avec ce thème. Les thèmes peuvent être : La Trahison, L'Ambition, La Rue, L'Amour Perdu, etc.</div>
+                    </div>
+                    <div class="comment">
+                        <div class="comment-author">Règle 2 — Les Punchlines</div>
+                        <div class="comment-text">Une punchline doit être courte, percutante et originale. Minimum 10 caractères, maximum 280 caractères. Plus c'est percutant, plus ça rapporte des votes !</div>
+                    </div>
+                    <div class="comment">
+                        <div class="comment-author">Règle 3 — Le Vote</div>
+                        <div class="comment-text">Chaque utilisateur peut voter une fois par punchline. Les votes sont anonymes et définitifs. Le battle dure 24h, le gagnant est celui avec le plus de votes.</div>
+                    </div>
+                    <div class="comment">
+                        <div class="comment-author">Règle 4 — Le Classement</div>
+                        <div class="comment-text">Les victoires rapportent des points. Top 3 du jour = bonus. Série de victoires = multiplicateur. Le Hall of Fame récompense les légendes de l'arène.</div>
+                    </div>
+                    <div class="comment">
+                        <div class="comment-author">Règle 5 — Fair Play</div>
+                        <div class="comment-text">Pas de triche, pas de bots, pas de contenu offensant. Le respect est la base. Les modérateurs surveillent et bannissent les tricheurs.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PARTICIPATE (Modal-like) ==================== -->
+        <div id="section-participate" class="section-view">
+            
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a onclick="navigateTo('home')">Accueil</a>
+                <span>/</span>
+                <a onclick="navigateTo('battles')">Battles</a>
+                <span>/</span>
+                <span class="current">Poster une Punchline</span>
+            </div>
+
+            <section class="participate-section">
+                <h2 class="section-title">
+                    <span>✍️</span>
+                    Rejoins le Combat
+                </h2>
+                <p style="color: var(--text-muted); margin-top: 0.5rem;">Thème actuel : <strong style="color: var(--primary);" id="participate-theme">La Trahison</strong></p>
+                
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label for="pseudo">Ton Nom de Guerrier</label>
+                        <input type="text" id="pseudo" placeholder="Ex: Shadow, Morningstarr..." value="Morgan">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="texte">Ta Punchline</label>
+                        <textarea id="texte" placeholder="Écris quelque chose qui frappe..."></textarea>
+                    </div>
+                    
+                    <button class="submit-btn" onclick="envoyer()">Poster ma Punchline</button>
+                    <div id="message" class="message"></div>
+                </div>
+            </section>
+        </div>
+
     </main>
 
     <!-- FOOTER -->
     <footer>
-        <p>© 2026 <span>Punchi Battle</span> — Tous droits réservés</p>
+        <p>© 2026 <span>Punchi Battle</span> — L'Arène des Mots</p>
     </footer>
 
     <script>
-        // Data avec l'image de Morgan
+        // ==================== DATA ====================
         const punchlines = [
             {
                 id: 1,
@@ -724,7 +1437,10 @@
                 avatar: "/mnt/agents/upload/jojo.jpg",
                 text: "J'ai serré des mains qui cachaient des couteaux.",
                 votes: 727,
-                time: "2 min"
+                time: "2 min",
+                comments: 23,
+                shares: 45,
+                theme: "La Trahison"
             },
             {
                 id: 2,
@@ -732,7 +1448,10 @@
                 avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
                 text: "Ils parlaient d'amour mais visaient mon dos.",
                 votes: 298,
-                time: "5 min"
+                time: "5 min",
+                comments: 12,
+                shares: 18,
+                theme: "La Trahison"
             },
             {
                 id: 3,
@@ -740,7 +1459,10 @@
                 avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
                 text: "La loyauté coûte cher, les traîtres sont gratuits.",
                 votes: 156,
-                time: "8 min"
+                time: "8 min",
+                comments: 8,
+                shares: 22,
+                theme: "La Trahison"
             },
             {
                 id: 4,
@@ -748,25 +1470,96 @@
                 avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop",
                 text: "Les sourires les plus beaux cachent les âmes les plus brisées.",
                 votes: 84,
-                time: "12 min"
+                time: "12 min",
+                comments: 5,
+                shares: 9,
+                theme: "La Trahison"
             }
         ];
 
         const leaderboard = [
-            { rank: 1, name: "Morgan", wins: 350, trend: "up" },
-            { rank: 2, name: "Big_Thug", wins: 229, trend: "stable" },
-            { rank: 3, name: "Shadow", wins: 155, trend: "up" },
-            { rank: 4, name: "NightWolf", wins: 142, trend: "down" },
-            { rank: 5, name: "LyricKiller", wins: 103, trend: "up" }
+            { rank: 1, name: "Morgan", avatar: "/mnt/agents/upload/jojo.jpg", wins: 350, trend: "up", streak: 12, best: "La Trahison" },
+            { rank: 2, name: "Big_Thug", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop", wins: 229, trend: "stable", streak: 3, best: "La Rue" },
+            { rank: 3, name: "Shadow", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop", wins: 155, trend: "up", streak: 7, best: "L'Ambition" },
+            { rank: 4, name: "NightWolf", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop", wins: 142, trend: "down", streak: 0, best: "L'Amour Perdu" },
+            { rank: 5, name: "LyricKiller", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop", wins: 103, trend: "up", streak: 4, best: "La Victoire" }
+        ];
+
+        const history = [
+            { rank: 1, theme: "La Trahison", votes: 727, date: "Aujourd'hui" },
+            { rank: 1, theme: "L'Ambition", votes: 612, date: "Hier" },
+            { rank: 2, theme: "La Rue", votes: 445, date: "Il y a 2 jours" },
+            { rank: 1, theme: "L'Amour Perdu", votes: 892, date: "Il y a 3 jours" },
+            { rank: 3, theme: "La Victoire", votes: 334, date: "Il y a 4 jours" }
         ];
 
         let userVotes = new Set();
+        let currentFilter = 'all';
+        let navigationStack = ['home'];
 
-        // Render Cards
-        function renderCards() {
-            const container = document.getElementById('cards-container');
-            container.innerHTML = punchlines.map(p => `
-                <div class="battle-card" data-id="${p.id}">
+        // ==================== NAVIGATION ====================
+        function navigateTo(section) {
+            // Hide all sections
+            document.querySelectorAll('.section-view').forEach(el => el.classList.remove('active'));
+            
+            // Show target section
+            const target = document.getElementById(`section-${section}`);
+            if (target) {
+                target.classList.add('active');
+            }
+            
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.section === section);
+            });
+            
+            // Update navigation stack
+            if (navigationStack[navigationStack.length - 1] !== section) {
+                navigationStack.push(section);
+            }
+            
+            // Show/hide back button
+            const backBtn = document.getElementById('backBtn');
+            if (section === 'home') {
+                backBtn.classList.remove('visible');
+                navigationStack = ['home'];
+            } else {
+                backBtn.classList.add('visible');
+            }
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        function goBack() {
+            if (navigationStack.length > 1) {
+                navigationStack.pop();
+                const previous = navigationStack[navigationStack.length - 1];
+                navigateTo(previous);
+            } else {
+                navigateTo('home');
+            }
+        }
+
+        function showDetail(type, id = null) {
+            if (type === 'regles') {
+                navigateTo('regles');
+            } else if (type === 'battle') {
+                showBattleDetail(id);
+            } else if (type === 'player') {
+                showPlayerDetail(id);
+            } else if (type === 'participate') {
+                navigateTo('participate');
+            }
+        }
+
+        // ==================== RENDER FUNCTIONS ====================
+        function renderCards(containerId, data) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            container.innerHTML = data.map(p => `
+                <div class="battle-card" data-id="${p.id}" onclick="showDetail('battle', ${p.id})">
                     <div class="card-author">
                         <img src="${p.avatar}" alt="${p.author}" class="avatar">
                         <div class="author-info">
@@ -775,11 +1568,16 @@
                         </div>
                     </div>
                     <p class="punchline">"${p.text}"</p>
+                    <div class="card-meta">
+                        <span>💬 ${p.comments} commentaires</span>
+                        <span>🔄 ${p.shares} partages</span>
+                        <span>🏷️ ${p.theme}</span>
+                    </div>
                     <div class="card-actions">
                         <div class="vote-count">
                             <span>${p.votes}</span> votes
                         </div>
-                        <button class="vote-btn ${userVotes.has(p.id) ? 'voted' : ''}" onclick="vote(${p.id})">
+                        <button class="vote-btn ${userVotes.has(p.id) ? 'voted' : ''}" onclick="event.stopPropagation(); vote(${p.id})">
                             ${userVotes.has(p.id) ? '✓ Voté' : '🔥 Voter'}
                         </button>
                     </div>
@@ -787,46 +1585,237 @@
             `).join('');
         }
 
-        // Render Leaderboard
-        function renderLeaderboard() {
-            const container = document.getElementById('leaderboard');
+        function renderLeaderboard(containerId, data) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
             const rankClasses = ['gold', 'silver', 'bronze'];
             
-            container.innerHTML = leaderboard.map((l, i) => `
-                <li class="leaderboard-item">
+            container.innerHTML = data.map((l, i) => `
+                <li class="leaderboard-item" onclick="showDetail('player', ${l.rank - 1})">
                     <div class="rank ${rankClasses[i] || ''}">#${l.rank}</div>
+                    <img src="${l.avatar}" alt="${l.name}" class="leader-avatar">
                     <div class="leader-info">
                         <h3>${l.name}</h3>
-                        <p>${l.wins} victoires • Tendance ${l.trend}</p>
+                        <p>${l.wins} victoires • Série: ${l.streak} 🔥 • Spécialité: ${l.best}</p>
                     </div>
                     <div class="wins">${l.wins} 🏆</div>
                 </li>
             `).join('');
         }
 
-        // Vote Function
+        function renderHistory() {
+            const container = document.getElementById('history-content');
+            if (!container) return;
+            
+            container.innerHTML = history.map(h => `
+                <div class="history-item">
+                    <div class="history-rank">#${h.rank}</div>
+                    <div class="history-content">
+                        <h4>${h.theme}</h4>
+                        <p>${h.votes} votes • ${h.rank === 1 ? '🥇 Victoire' : h.rank === 2 ? '🥈 2ème place' : '🥉 3ème place'}</p>
+                    </div>
+                    <div class="history-date">${h.date}</div>
+                </div>
+            `).join('');
+        }
+
+        // ==================== DETAIL VIEWS ====================
+        function showBattleDetail(id) {
+            const battle = punchlines.find(p => p.id === id);
+            if (!battle) return;
+            
+            document.getElementById('detail-breadcrumb').textContent = battle.author;
+            
+            const content = document.getElementById('battle-detail-content');
+            content.innerHTML = `
+                <div class="detail-header">
+                    <img src="${battle.avatar}" alt="${battle.author}" class="detail-avatar">
+                    <div class="detail-info">
+                        <h2>${battle.author}</h2>
+                        <p>Thème: ${battle.theme} • Il y a ${battle.time}</p>
+                    </div>
+                </div>
+                
+                <p style="font-size: 1.5rem; font-style: italic; padding: 2rem; border-left: 4px solid var(--primary); margin: 2rem 0; background: var(--surface); border-radius: 0 12px 12px 0;">
+                    "${battle.text}"
+                </p>
+                
+                <div class="detail-stats">
+                    <div class="detail-stat">
+                        <div class="number">${battle.votes}</div>
+                        <div class="label">Votes</div>
+                    </div>
+                    <div class="detail-stat">
+                        <div class="number">${battle.comments}</div>
+                        <div class="label">Commentaires</div>
+                    </div>
+                    <div class="detail-stat">
+                        <div class="number">${battle.shares}</div>
+                        <div class="label">Partages</div>
+                    </div>
+                    <div class="detail-stat">
+                        <div class="number">#${punchlines.indexOf(battle) + 1}</div>
+                        <div class="label">Classement</div>
+                    </div>
+                </div>
+                
+                <div class="detail-content">
+                    <h3>💬 Commentaires</h3>
+                    <div class="comments-list">
+                        <div class="comment">
+                            <div class="comment-author">StreetPoet</div>
+                            <div class="comment-text">Cette punchline est légendaire ! 🔥</div>
+                        </div>
+                        <div class="comment">
+                            <div class="comment-author">FlowMaster</div>
+                            <div class="comment-text">Trop fort, tu mérites la première place.</div>
+                        </div>
+                        <div class="comment">
+                            <div class="comment-author">NightWolf</div>
+                            <div class="comment-text">J'aurais pas dit mieux... Respect.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                    <button class="vote-btn ${userVotes.has(battle.id) ? 'voted' : ''}" onclick="vote(${battle.id}); showBattleDetail(${battle.id})" style="flex: 1; justify-content: center;">
+                        ${userVotes.has(battle.id) ? '✓ Voté' : '🔥 Voter'}
+                    </button>
+                    <button class="submit-btn" onclick="showDetail('participate')" style="flex: 1;">
+                        ✍️ Répondre
+                    </button>
+                </div>
+            `;
+            
+            navigateTo('battle-detail');
+        }
+
+        function showPlayerDetail(index) {
+            const player = leaderboard[index];
+            if (!player) return;
+            
+            document.getElementById('player-breadcrumb').textContent = player.name;
+            
+            const content = document.getElementById('player-detail-content');
+            content.innerHTML = `
+                <div class="profile-header">
+                    <img src="${player.avatar}" alt="${player.name}" class="profile-avatar-large">
+                    <div class="profile-info">
+                        <h2>${player.name}</h2>
+                        <p>Rank #${player.rank} • ${player.wins} victoires</p>
+                        <span class="tag">${player.streak > 5 ? '🔥 Série Enflammée' : '⚔️ Guerrier'}</span>
+                    </div>
+                </div>
+                
+                <div class="profile-stats-grid">
+                    <div class="profile-stat-card">
+                        <div class="icon">🏆</div>
+                        <div class="value">${player.wins}</div>
+                        <div class="label">Victoires</div>
+                    </div>
+                    <div class="profile-stat-card">
+                        <div class="icon">🔥</div>
+                        <div class="value">${player.streak}</div>
+                        <div class="label">Série Actuelle</div>
+                    </div>
+                    <div class="profile-stat-card">
+                        <div class="icon">🎯</div>
+                        <div class="value">${player.best}</div>
+                        <div class="label">Meilleur Thème</div>
+                    </div>
+                    <div class="profile-stat-card">
+                        <div class="icon">📈</div>
+                        <div class="value">${player.trend === 'up' ? '↗️' : player.trend === 'down' ? '↘️' : '➡️'}</div>
+                        <div class="label">Tendance</div>
+                    </div>
+                </div>
+                
+                <div class="history-list">
+                    <h3 style="font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; margin-bottom: 1rem; letter-spacing: 1px;">
+                        <span>📜</span> Derniers Battles
+                    </h3>
+                    <div class="history-item">
+                        <div class="history-rank">#1</div>
+                        <div class="history-content">
+                            <h4>${player.best}</h4>
+                            <p>Meilleure performance</p>
+                        </div>
+                        <div class="history-date">Récent</div>
+                    </div>
+                    <div class="history-item">
+                        <div class="history-rank">#${player.rank}</div>
+                        <div class="history-content">
+                            <h4>Classement Actuel</h4>
+                            <p>${player.wins} victoires cumulées</p>
+                        </div>
+                        <div class="history-date">En cours</div>
+                    </div>
+                </div>
+            `;
+            
+            navigateTo('player-detail');
+        }
+
+        // ==================== FILTERS ====================
+        function filterBattles(type) {
+            currentFilter = type;
+            
+            // Update buttons
+            document.querySelectorAll('#section-battles .filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.toLowerCase().includes(type === 'all' ? 'tous' : type === 'popular' ? 'pop' : type === 'recent' ? 'réc' : 'mes'));
+            });
+            
+            let filtered = [...punchlines];
+            if (type === 'popular') {
+                filtered = filtered.sort((a, b) => b.votes - a.votes);
+            } else if (type === 'recent') {
+                filtered = filtered.sort((a, b) => a.id - b.id);
+            } else if (type === 'moi') {
+                filtered = filtered.filter(p => p.author === 'Morgan');
+            }
+            
+            renderCards('battles-cards', filtered);
+        }
+
+        function filterLeaderboard(type) {
+            document.querySelectorAll('#section-classement .filter-btn').forEach(btn => {
+                btn.classList.toggle('active', 
+                    (type === 'all' && btn.textContent.includes('Global')) ||
+                    (type === 'week' && btn.textContent.includes('Semaine')) ||
+                    (type === 'month' && btn.textContent.includes('Mois'))
+                );
+            });
+            
+            // Simulate different data for demo
+            let filtered = [...leaderboard];
+            if (type === 'week') {
+                filtered = filtered.sort(() => Math.random() - 0.5);
+            } else if (type === 'month') {
+                filtered = filtered.reverse();
+            }
+            
+            renderLeaderboard('leaderboard-list', filtered);
+        }
+
+        // ==================== VOTE & SUBMIT ====================
         function vote(id) {
             const card = punchlines.find(p => p.id === id);
-            const btn = document.querySelector(`[data-id="${id}"] .vote-btn`);
+            if (!card) return;
             
             if (userVotes.has(id)) {
-                // Unvote
                 userVotes.delete(id);
                 card.votes--;
             } else {
-                // Vote
                 userVotes.add(id);
                 card.votes++;
-                
-                // Animation effect
-                btn.style.transform = 'scale(1.2)';
-                setTimeout(() => btn.style.transform = 'scale(1)', 200);
             }
             
-            renderCards();
+            // Re-render current view
+            renderCards('recent-cards', punchlines.slice(0, 2));
+            filterBattles(currentFilter);
         }
 
-        // Submit Function
         function envoyer() {
             const pseudo = document.getElementById('pseudo').value.trim();
             const texte = document.getElementById('texte').value.trim();
@@ -844,21 +1833,20 @@
                 return;
             }
             
-            // Add new punchline
             const newPunchline = {
                 id: punchlines.length + 1,
                 author: pseudo,
-                avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${pseudo}`,
+                avatar: pseudo === 'Morgan' ? '/mnt/agents/upload/jojo.jpg' : `https://api.dicebear.com/7.x/avataaars/svg?seed=${pseudo}`,
                 text: texte,
                 votes: 0,
-                time: "À l'instant"
+                time: "À l'instant",
+                comments: 0,
+                shares: 0,
+                theme: document.getElementById('theme-text').textContent
             };
             
             punchlines.unshift(newPunchline);
-            renderCards();
             
-            // Reset form
-            document.getElementById('pseudo').value = '';
             document.getElementById('texte').value = '';
             
             message.className = 'message success';
@@ -866,25 +1854,37 @@
             
             setTimeout(() => {
                 message.style.display = 'none';
-            }, 3000);
+                navigateTo('battles');
+            }, 2000);
         }
 
-        // Initialize
-        renderCards();
-        renderLeaderboard();
+        // ==================== INITIALIZATION ====================
+        function init() {
+            renderCards('recent-cards', punchlines.slice(0, 2));
+            renderCards('battles-cards', punchlines);
+            renderLeaderboard('leaderboard-list', leaderboard);
+            renderHistory();
+            
+            // Theme rotation
+            const themes = ["La Trahison", "L'Ambition", "La Rue", "L'Amour Perdu", "La Victoire"];
+            let themeIndex = 0;
+            
+            setInterval(() => {
+                themeIndex = (themeIndex + 1) % themes.length;
+                const themeText = document.getElementById('theme-text');
+                const participateTheme = document.getElementById('participate-theme');
+                
+                themeText.style.opacity = '0';
+                setTimeout(() => {
+                    themeText.textContent = themes[themeIndex];
+                    if (participateTheme) participateTheme.textContent = themes[themeIndex];
+                    themeText.style.opacity = '1';
+                }, 300);
+            }, 10000);
+        }
 
-        // Random theme rotation (demo)
-        const themes = ["La Trahison", "L'Ambition", "La Rue", "L'Amour Perdu", "La Victoire"];
-        let themeIndex = 0;
-        
-        setInterval(() => {
-            themeIndex = (themeIndex + 1) % themes.length;
-            document.getElementById('theme-text').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('theme-text').textContent = themes[themeIndex];
-                document.getElementById('theme-text').style.opacity = '1';
-            }, 300);
-        }, 10000);
+        // Start
+        init();
     </script>
 </body>
 </html>
