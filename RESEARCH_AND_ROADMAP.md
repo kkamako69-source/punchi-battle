@@ -28,11 +28,14 @@ Références :
 
 ## Jeu de données linguistique candidat — Lingala
 
-La **Lingala Read Speech Corpus (LRSC)** publiée sur Hugging Face par BantuLanguagesInitiative indique environ 5,01 heures de parole lue, 2 940 énoncés et 31 locuteurs. Elle peut servir de point de départ pour une future fonction vocale en Lingala (navigation dictée, recherche ou transcription), pas pour inventer des punchlines ni pour remplir la base communautaire.
+Deux corpus de Bantu Languages Initiative sont disponibles sur Hugging Face et portent explicitement la licence CC-BY-4.0 :
 
-Avant tout usage : relire la fiche de données, la licence applicable et les conditions de la publication originale, vérifier les droits et le consentement des locuteurs, conserver l'attribution et ne pas redistribuer les enregistrements sans autorisation.
+- **LRSC — Lingala Read Speech Corpus** : https://huggingface.co/datasets/BantuLanguagesInitiative/LRSC. Environ 5,01 heures de parole lue et 2 940 énoncés avec transcription. C'est le point de départ le plus adapté pour tester une recherche vocale ou une transcription en Lingala.
+- **CSRC — Congolese Speech Radio Corpus** : https://huggingface.co/datasets/BantuLanguagesInitiative/CSRC. Environ 97 779 segments et 690,35 heures de radio en Lingala, Kikongo et Tshiluba, sans transcriptions de référence. Il convient plutôt à l'apprentissage auto-supervisé et à l'adaptation acoustique ; le téléchargement est volumineux.
 
-Référence : https://huggingface.co/datasets/BantuLanguagesInitiative/LRSC
+Ces corpus concernent la reconnaissance et la recherche vocale, pas la génération de punchlines. Ne pas les utiliser pour cloner la voix d'un locuteur. Avant toute utilisation, conserver l'attribution aux auteurs du dataset original et à Bantu Languages Initiative, vérifier la carte de chaque dataset, les conditions de consentement et les limites du corpus. Ne pas redistribuer l'audio sans vérifier les droits.
+
+Sources : https://huggingface.co/datasets/BantuLanguagesInitiative/LRSC · https://huggingface.co/datasets/BantuLanguagesInitiative/CSRC
 
 ## Règles de données à conserver
 
