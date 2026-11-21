@@ -30,3 +30,9 @@ python tools/check_site.py
 ```
 
 GitHub Actions lance aussi ce contrôle à chaque modification de la branche `main` et pour chaque pull request. Les avertissements (par exemple un fragment HTML ou une ressource locale introuvable) doivent être examinés ; un passage réussi ne remplace pas les tests dans un vrai navigateur.
+
+## Données et sécurité
+
+Le site est actuellement une démonstration locale : votes et participations ne sont pas encore partagés entre utilisateurs. Le schéma Supabase préparatoire est dans [supabase/migrations](supabase/migrations/202611210001_punchi_battle_schema.sql) et son guide est dans [supabase/README.md](supabase/README.md). Il doit être appliqué et testé dans un projet Supabase avant toute connexion du site. Ne publie jamais une clé `service_role` dans le navigateur.
+
+La recherche technique et les sources de données candidates sont documentées dans [RESEARCH_AND_ROADMAP.md](RESEARCH_AND_ROADMAP.md).
