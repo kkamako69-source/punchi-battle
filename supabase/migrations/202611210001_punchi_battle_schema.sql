@@ -99,29 +99,8 @@ create trigger entries_set_updated_at
 before update on public.entries
 for each row execute function public.set_updated_at();
 
--- Create a public profile on signup without copying email or password data.
-create or replace function public.handle_new_user()
-returns trigger
-language plpgsql
-security definer
-set search_path = ''
-as $$
-begin
-    insert into public.profiles (id, username, display_name)
-    values (
-        new.id,
-        'mc_' || left(replace(new.id::text, '-', ''), 12),
-        coalesce(left(new.raw_user_meta_data ->> 'display_name', 60), '')
-    )
-    on conflict (id) do nothing;
-    return new;
-end;
-$$;
-
-drop trigger if exists on_auth_user_created on auth.users;
-create trigger on_auth_user_created
-after insert on auth.users
-for each row execute function public.handle_new_user();
+-- Profiles are created by the signed-in client after sign-up / first sign-in.
+-- The self-insert policy below binds the row to auth.uid(); no SECURITY DEFINER trigger is exposed.
 
 alter table public.profiles enable row level security;
 alter table public.themes enable row level security;
@@ -134,6 +113,11 @@ alter table public.reports enable row level security;
 drop policy if exists profiles_read_public on public.profiles;
 create policy profiles_read_public on public.profiles
 for select to anon, authenticated using (true);
+
+drop policy if exists profiles_insert_self on public.profiles;
+create policy profiles_insert_self on public.profiles
+for insert to authenticated
+with check (id = (select auth.uid()));
 
 drop policy if exists profiles_update_self on public.profiles;
 create policy profiles_update_self on public.profiles
@@ -153,13 +137,33 @@ using (status = 'published' or author_id = (select auth.uid()));
 drop policy if exists entries_submit_pending on public.entries;
 create policy entries_submit_pending on public.entries
 for insert to authenticated
-with check (author_id = (select auth.uid()) and status = 'pending');
+with check (
+    author_id = (select auth.uid())
+    and status = 'pending'
+    and exists (
+        select 1 from public.themes t
+        where t.id = entries.theme_id
+          and t.is_active = true
+          and (t.opens_at is null or t.opens_at <= now())
+          and (t.closes_at is null or t.closes_at > now())
+    )
+);
 
 drop policy if exists entries_edit_own_pending on public.entries;
 create policy entries_edit_own_pending on public.entries
 for update to authenticated
 using (author_id = (select auth.uid()) and status = 'pending')
-with check (author_id = (select auth.uid()) and status = 'pending');
+with check (
+    author_id = (select auth.uid())
+    and status = 'pending'
+    and exists (
+        select 1 from public.themes t
+        where t.id = entries.theme_id
+          and t.is_active = true
+          and (t.opens_at is null or t.opens_at <= now())
+          and (t.closes_at is null or t.closes_at > now())
+    )
+);
 
 drop policy if exists entries_delete_own_pending on public.entries;
 create policy entries_delete_own_pending on public.entries
