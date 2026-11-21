@@ -20,3 +20,13 @@ GitHub Pages est activé pour ce dépôt. Pour vérifier l’adresse exacte et l
 - Conserver une copie/version de sauvegarde avant les changements qui touchent l’interface.
 
 > État documenté : prototype front-end ; les fonctions de production doivent être validées avant de les présenter comme opérationnelles.
+
+## Contrôle automatique
+
+Le contrôle de structure HTML peut être lancé localement avec :
+
+```sh
+python tools/check_site.py
+```
+
+GitHub Actions lance aussi ce contrôle à chaque modification de la branche `main` et pour chaque pull request. Les avertissements (par exemple un fragment HTML ou une ressource locale introuvable) doivent être examinés ; un passage réussi ne remplace pas les tests dans un vrai navigateur.
