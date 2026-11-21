@@ -57,6 +57,19 @@ create table if not exists public.comments (
     created_at timestamptz not null default now()
 );
 
+create table if not exists public.reports (
+    id uuid primary key default gen_random_uuid(),
+    reporter_id uuid not null references public.profiles(id) on delete cascade,
+    target_type text not null check (target_type in ('entry', 'comment')),
+    target_id uuid not null,
+    category text not null check (category in ('spam', 'harassment', 'impersonation', 'copyright', 'other')),
+    details text not null default '' check (char_length(details) <= 500),
+    status text not null default 'open'
+        check (status in ('open', 'reviewing', 'resolved', 'dismissed')),
+    created_at timestamptz not null default now(),
+    constraint one_report_per_user_per_target unique (reporter_id, target_type, target_id)
+);
+
 create index if not exists entries_theme_status_created_idx
     on public.entries (theme_id, status, created_at desc);
 create index if not exists entries_author_created_idx
@@ -115,6 +128,7 @@ alter table public.themes enable row level security;
 alter table public.entries enable row level security;
 alter table public.votes enable row level security;
 alter table public.comments enable row level security;
+alter table public.reports enable row level security;
 
 -- Public profile fields only; email and credential data are never exposed here.
 drop policy if exists profiles_read_public on public.profiles;
@@ -187,6 +201,30 @@ with check (
     and exists (
         select 1 from public.entries e
         where e.id = comments.entry_id and e.status = 'published'
+    )
+);
+
+drop policy if exists reports_read_own on public.reports;
+create policy reports_read_own on public.reports
+for select to authenticated
+using (reporter_id = (select auth.uid()));
+
+drop policy if exists reports_submit_visible_target on public.reports;
+create policy reports_submit_visible_target on public.reports
+for insert to authenticated
+with check (
+    reporter_id = (select auth.uid())
+    and status = 'open'
+    and (
+        (target_type = 'entry' and exists (
+            select 1 from public.entries e
+            where e.id = reports.target_id and e.status = 'published'
+        ))
+        or
+        (target_type = 'comment' and exists (
+            select 1 from public.comments c
+            where c.id = reports.target_id and c.status = 'published'
+        ))
     )
 );
 
