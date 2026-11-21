@@ -1112,6 +1112,7 @@
 
 <body>
     <div class="bg-animation"></div>
+    <div role="note" aria-label="Mode démonstration" style="padding:.65rem 1rem;text-align:center;background:rgba(255,215,0,.09);border-bottom:1px solid rgba(255,215,0,.28);color:#ffe79a;font-size:.82rem;line-height:1.5">DÉMO LOCALE — les punchlines et les votes sont enregistrés uniquement sur cet appareil. Aucun compte ni vote public n’est encore connecté à une base de données.</div>
 
     <!-- HEADER -->
     <header>
@@ -1304,7 +1305,7 @@
             </div>
 
             <div class="profile-header">
-                <img src="/mnt/agents/upload/jojo.jpg" alt="Morgan" class="profile-avatar-large">
+                <img src="https://api.dicebear.com/7.x/initials/svg?seed=Morgan" alt="Morgan" class="profile-avatar-large">
                 <div class="profile-info">
                     <h2>Morgan</h2>
                     <p>Légende de l'Arène • Membre depuis 2024</p>
@@ -1497,6 +1498,49 @@
         let currentFilter = 'all';
         let navigationStack = ['home'];
 
+        // Cette version est une démonstration locale : aucun vote n'est envoyé à un serveur.
+        const PB_DEMO_STATE_KEY = 'punchi-battle-demo-v1';
+        function escapeHTML(value) {
+            return String(value ?? '').replace(/[&<>"']/g, function (char) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char];
+            });
+        }
+        function safeAvatarUrl(value, seed) {
+            const candidate = String(value || '');
+            if (/^https:\/\/(images\.unsplash\.com|api\.dicebear\.com)\//i.test(candidate)) return candidate;
+            return 'https://api.dicebear.com/7.x/initials/svg?seed=' + encodeURIComponent(String(seed || 'MC'));
+        }
+        function restoreDemoState() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(PB_DEMO_STATE_KEY) || 'null');
+                if (!saved || saved.version !== 1) return;
+                const knownIds = new Set(punchlines.map(function (item) { return item.id; }));
+                const entries = Array.isArray(saved.entries) ? saved.entries.filter(function (item) {
+                    return item && Number.isSafeInteger(item.id) && item.id > 0 && !knownIds.has(item.id) &&
+                        item.isUserEntry === true && typeof item.author === 'string' &&
+                        typeof item.text === 'string' && item.text.length <= 280;
+                }) : [];
+                punchlines.unshift.apply(punchlines, entries);
+                userVotes = new Set(Array.isArray(saved.votes) ? saved.votes.filter(Number.isSafeInteger) : []);
+                punchlines.forEach(function (item) {
+                    if (!item.isUserEntry && userVotes.has(item.id)) item.votes += 1;
+                });
+            } catch (error) {
+                console.warn('État local de démonstration ignoré :', error);
+            }
+        }
+        function saveDemoState() {
+            try {
+                const entries = punchlines.filter(function (item) { return item.isUserEntry; });
+                localStorage.setItem(PB_DEMO_STATE_KEY, JSON.stringify({
+                    version: 1, entries: entries, votes: Array.from(userVotes)
+                }));
+            } catch (error) {
+                console.warn('Impossible de sauvegarder la démo locale :', error);
+            }
+        }
+
+
         // ==================== NAVIGATION ====================
         function navigateTo(section) {
             // Hide all sections
@@ -1561,17 +1605,17 @@
             container.innerHTML = data.map(p => `
                 <div class="battle-card" data-id="${p.id}" onclick="showDetail('battle', ${p.id})">
                     <div class="card-author">
-                        <img src="${p.avatar}" alt="${p.author}" class="avatar">
+                        <img src="${escapeHTML(safeAvatarUrl(p.avatar, p.author))}" alt="${escapeHTML(p.author)}" class="avatar" loading="lazy">
                         <div class="author-info">
-                            <h4>${p.author}</h4>
-                            <span>Il y a ${p.time}</span>
+                            <h4>${escapeHTML(p.author)}</h4>
+                            <span>Il y a ${escapeHTML(p.time)}</span>
                         </div>
                     </div>
-                    <p class="punchline">"${p.text}"</p>
+                    <p class="punchline">"${escapeHTML(p.text)}"</p>
                     <div class="card-meta">
                         <span>💬 ${p.comments} commentaires</span>
                         <span>🔄 ${p.shares} partages</span>
-                        <span>🏷️ ${p.theme}</span>
+                        <span>🏷️ ${escapeHTML(p.theme)}</span>
                     </div>
                     <div class="card-actions">
                         <div class="vote-count">
@@ -1594,10 +1638,10 @@
             container.innerHTML = data.map((l, i) => `
                 <li class="leaderboard-item" onclick="showDetail('player', ${l.rank - 1})">
                     <div class="rank ${rankClasses[i] || ''}">#${l.rank}</div>
-                    <img src="${l.avatar}" alt="${l.name}" class="leader-avatar">
+                    <img src="${escapeHTML(safeAvatarUrl(l.avatar, l.name))}" alt="${escapeHTML(l.name)}" class="leader-avatar" loading="lazy">
                     <div class="leader-info">
-                        <h3>${l.name}</h3>
-                        <p>${l.wins} victoires • Série: ${l.streak} 🔥 • Spécialité: ${l.best}</p>
+                        <h3>${escapeHTML(l.name)}</h3>
+                        <p>${l.wins} victoires • Série: ${l.streak} 🔥 • Spécialité: ${escapeHTML(l.best)}</p>
                     </div>
                     <div class="wins">${l.wins} 🏆</div>
                 </li>
@@ -1612,7 +1656,7 @@
                 <div class="history-item">
                     <div class="history-rank">#${h.rank}</div>
                     <div class="history-content">
-                        <h4>${h.theme}</h4>
+                        <h4>${escapeHTML(h.theme)}</h4>
                         <p>${h.votes} votes • ${h.rank === 1 ? '🥇 Victoire' : h.rank === 2 ? '🥈 2ème place' : '🥉 3ème place'}</p>
                     </div>
                     <div class="history-date">${h.date}</div>
@@ -1630,15 +1674,15 @@
             const content = document.getElementById('battle-detail-content');
             content.innerHTML = `
                 <div class="detail-header">
-                    <img src="${battle.avatar}" alt="${battle.author}" class="detail-avatar">
+                    <img src="${escapeHTML(safeAvatarUrl(battle.avatar, battle.author))}" alt="${escapeHTML(battle.author)}" class="detail-avatar">
                     <div class="detail-info">
-                        <h2>${battle.author}</h2>
-                        <p>Thème: ${battle.theme} • Il y a ${battle.time}</p>
+                        <h2>${escapeHTML(battle.author)}</h2>
+                        <p>Thème: ${escapeHTML(battle.theme)} • Il y a ${escapeHTML(battle.time)}</p>
                     </div>
                 </div>
                 
                 <p style="font-size: 1.5rem; font-style: italic; padding: 2rem; border-left: 4px solid var(--primary); margin: 2rem 0; background: var(--surface); border-radius: 0 12px 12px 0;">
-                    "${battle.text}"
+                    "${escapeHTML(battle.text)}"
                 </p>
                 
                 <div class="detail-stats">
@@ -1812,6 +1856,7 @@
             }
             
             // Re-render current view
+            saveDemoState();
             renderCards('recent-cards', punchlines.slice(0, 2));
             filterBattles(currentFilter);
         }
@@ -1834,9 +1879,10 @@
             }
             
             const newPunchline = {
-                id: punchlines.length + 1,
+                id: Math.max(0, ...punchlines.map(function (item) { return Number(item.id) || 0; })) + 1,
                 author: pseudo,
-                avatar: pseudo === 'Morgan' ? '/mnt/agents/upload/jojo.jpg' : `https://api.dicebear.com/7.x/avataaars/svg?seed=${pseudo}`,
+                avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=' + encodeURIComponent(pseudo),
+                isUserEntry: true,
                 text: texte,
                 votes: 0,
                 time: "À l'instant",
@@ -1846,6 +1892,7 @@
             };
             
             punchlines.unshift(newPunchline);
+            saveDemoState();
             
             document.getElementById('texte').value = '';
             
@@ -1860,6 +1907,7 @@
 
         // ==================== INITIALIZATION ====================
         function init() {
+            restoreDemoState();
             renderCards('recent-cards', punchlines.slice(0, 2));
             renderCards('battles-cards', punchlines);
             renderLeaderboard('leaderboard-list', leaderboard);
