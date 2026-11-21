@@ -26,6 +26,12 @@ Le dépôt actuel utilise encore des données de démonstration dans le navigate
 
 Pour connecter le front-end, il faudra ensuite ajouter le client Supabase et utiliser uniquement l'URL du projet et la clé **publishable**. Ne mets jamais une clé `service_role`, un mot de passe de base de données ou un secret serveur dans un fichier HTML/JavaScript public.
 
+## Thèmes et signalements
+
+- Le fichier `seed.sql` contient un catalogue initial de thèmes, tous inactifs. Un responsable doit sélectionner les thèmes à activer.
+- La table `reports` permet à un utilisateur connecté de signaler une participation ou un commentaire publié.
+- Un utilisateur ne peut consulter que ses propres signalements et ne peut pas modifier leur statut. La décision de modération reste une opération privilégiée côté serveur.
+
 ## Modération
 
 Les changements de statut vers `published` ou `hidden`, la gestion des thèmes et les actions de modération doivent être exécutés depuis un backend / une Edge Function protégée. Ne donne pas les permissions d'administration au navigateur.
