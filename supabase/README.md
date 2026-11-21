@@ -6,11 +6,17 @@ Cette configuration prépare le passage du prototype statique à une application
 
 - PostgreSQL via Supabase.
 - Authentification gérée par Supabase Auth (pas de mots de passe maison dans le navigateur).
-- Tables `profiles`, `themes`, `entries`, `votes` et `comments`.
+- Tables `profiles`, `themes`, `entries`, `votes`, `comments` et `reports`.
 - Règles Row Level Security (RLS) sur toutes les tables.
 - Un seul vote par utilisateur et par punchline.
 - Les participations et commentaires commencent en attente de modération.
+- Les profils sont créés par le client après inscription ou première connexion, via la policy `profiles_insert_self`; aucun trigger `SECURITY DEFINER` n'est exposé dans le schéma public.
+- Les participations ne sont acceptées que pour un thème activé et dans sa fenêtre de dates.
 - Les données privées d'authentification ne sont pas copiées dans les profils publics.
+
+## Statut au 21 novembre 2026
+
+Le compte Supabase connecté ne contient encore aucun projet. La migration est préparée dans GitHub, mais elle n'a pas été appliquée à une base réelle. Le site fonctionne toujours en mode démonstration locale.
 
 ## Mise en place manuelle
 
@@ -43,6 +49,8 @@ Le niveau gratuit est adapté aux essais, pas à une garantie d'exploitation san
 ## Contrôles après exécution
 
 - Un visiteur anonyme ne peut lire que les thèmes actifs, les participations publiées et les commentaires publiés.
-- Un utilisateur connecté ne peut modifier que son profil et ses propres participations en attente.
-- Un utilisateur ne peut voter qu'une fois par participation.
+- Un utilisateur connecté crée son propre profil, et ne peut modifier que son profil et ses propres participations en attente.
+- Les thèmes utilisés pour les nouvelles participations doivent être activés et dans leur période d'ouverture.
+- Un utilisateur ne peut voter qu'une fois par participation ; il peut retirer son vote.
+- Les signalements restent visibles uniquement par leur auteur.
 - Les clés privilégiées ne sont jamais présentes dans le code public.
