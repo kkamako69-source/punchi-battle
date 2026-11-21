@@ -1412,12 +1412,12 @@
                 <div class="form-grid">
                     <div class="input-group">
                         <label for="pseudo">Ton Nom de Guerrier</label>
-                        <input type="text" id="pseudo" placeholder="Ex: Shadow, Morningstarr..." value="Morgan">
+                        <input type="text" id="pseudo" placeholder="Ex: Shadow, Morningstarr..." value="Morgan" minlength="2" maxlength="24" autocomplete="nickname">
                     </div>
                     
                     <div class="input-group">
                         <label for="texte">Ta Punchline</label>
-                        <textarea id="texte" placeholder="Écris quelque chose qui frappe..."></textarea>
+                        <textarea id="texte" placeholder="Écris quelque chose qui frappe..." minlength="10" maxlength="280"></textarea>
                     </div>
                     
                     <button class="submit-btn" onclick="envoyer()">Poster ma Punchline</button>
@@ -1870,15 +1870,23 @@
             const texte = document.getElementById('texte').value.trim();
             const message = document.getElementById('message');
             
+            message.style.display = 'block';
+
             if (!pseudo || !texte) {
                 message.className = 'message error';
                 message.textContent = 'Remplis tous les champs, guerrier !';
                 return;
             }
-            
-            if (texte.length < 10) {
+
+            if (pseudo.length < 2 || pseudo.length > 24) {
                 message.className = 'message error';
-                message.textContent = 'Ta punchline est trop courte pour faire mal...';
+                message.textContent = 'Ton nom de guerrier doit contenir entre 2 et 24 caractères.';
+                return;
+            }
+
+            if (texte.length < 10 || texte.length > 280) {
+                message.className = 'message error';
+                message.textContent = 'Ta punchline doit contenir entre 10 et 280 caractères.';
                 return;
             }
             
