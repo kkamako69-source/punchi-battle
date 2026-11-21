@@ -100,7 +100,7 @@ before update on public.entries
 for each row execute function public.set_updated_at();
 
 -- Profiles are created by the signed-in client after sign-up / first sign-in.
--- The self-insert policy below binds the row to auth.uid(); no SECURITY DEFINER trigger is exposed.
+-- The self-insert policy below binds the row to auth.uid(); no privileged signup trigger is exposed.
 
 alter table public.profiles enable row level security;
 alter table public.themes enable row level security;
