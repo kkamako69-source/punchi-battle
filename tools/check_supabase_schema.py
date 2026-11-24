@@ -7,6 +7,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 MIGRATION = ROOT / "supabase/migrations/202611210001_punchi_battle_schema.sql"
+INDEX_MIGRATION = ROOT / "supabase/migrations/20261124095000_add_fk_owner_indexes.sql"
 SEED = ROOT / "supabase/seed.sql"
 
 TABLES = ("profiles", "themes", "entries", "votes", "comments", "reports")
@@ -39,6 +40,12 @@ def main() -> int:
     else:
         migration = MIGRATION.read_text(encoding="utf-8").lower()
 
+    if not INDEX_MIGRATION.is_file():
+        errors.append("migration d'index complémentaires manquante")
+        index_migration = ""
+    else:
+        index_migration = INDEX_MIGRATION.read_text(encoding="utf-8").lower()
+
     if not SEED.is_file():
         errors.append("catalogue seed SQL manquant")
         seed = ""
@@ -69,6 +76,18 @@ def main() -> int:
         errors.append("GRANT de lecture explicite des tables exposées manquant")
     if "grant select, insert, delete on public.votes to authenticated" not in migration:
         errors.append("GRANT de votes explicite manquant")
+    if "grant insert on public.profiles to authenticated" not in migration:
+        errors.append("GRANT d'insertion des profils manquant")
+    if "grant select, insert on public.reports to authenticated" not in migration:
+        errors.append("GRANT de lecture/insertion des signalements manquant")
+    if "char_length(avatar_url) <= 2048" not in migration or "'^https://'" not in migration:
+        errors.append("validation HTTPS/longueur avatar manquante")
+    if "revoke all on function public.set_updated_at() from public, anon, authenticated" not in migration:
+        errors.append("EXECUTE de la fonction trigger non révoqué pour les rôles publics")
+    if "create index if not exists votes_voter_created_idx" not in index_migration:
+        errors.append("index de clé étrangère votes_voter_id manquant")
+    if "create index if not exists comments_author_created_idx" not in index_migration:
+        errors.append("index de clé étrangère comments_author_id manquant")
     if "is_active)\nvalues" not in seed or ", false)" not in seed:
         errors.append("les thèmes de départ doivent rester inactifs par défaut")
 
@@ -82,7 +101,7 @@ def main() -> int:
         + str(len(TABLES))
         + " tables, "
         + str(len(REQUIRED_POLICIES))
-        + " policies attendues, contraintes de votes et GRANT vérifiés."
+        + " policies attendues, contraintes, validations d’URL, GRANT et index vérifiés."
     )
     print("NOTE : vérification statique uniquement ; une vraie migration et des tests RLS restent nécessaires.")
     return 0
