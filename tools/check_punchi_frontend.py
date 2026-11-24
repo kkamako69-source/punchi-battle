@@ -155,7 +155,7 @@ def main() -> int:
         errors.append("zone de connexion téléphonique non isolée pour son masquage")
     if 'id="pb-cloud-phone-country"' not in html or 'value="+242" selected' not in html:
         errors.append("indicatif Congo prioritaire dans l’inscription SMS manquant")
-    if "normalizeE164" not in client or "phone.startsWith(\"+\")" not in client:
+    if "normalizeE164" not in client or "rawPhone.startsWith(\"+\")" not in client:
         errors.append("saisie internationale E.164 avec indicatif local manquante")
     if "profile_contacts" in html:
         errors.append("les coordonnées privées ne doivent pas être injectées comme données littérales dans le HTML")
