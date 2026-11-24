@@ -1110,6 +1110,69 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+    
+        /* ==================== LIVE SUPABASE AREA ==================== */
+        [hidden] { display: none !important; }
+        .pb-cloud-section {
+            width: min(1120px, calc(100% - 2rem));
+            margin: 1.5rem auto 2rem;
+            padding: clamp(1rem, 3vw, 2rem);
+            border: 1px solid rgba(0, 255, 247, .28);
+            border-radius: 22px;
+            background: linear-gradient(145deg, rgba(11, 35, 48, .96), rgba(18, 18, 32, .98));
+            box-shadow: 0 18px 55px rgba(0,0,0,.22);
+        }
+        .pb-cloud-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:1.25rem; }
+        .pb-cloud-kicker { color:#00fff7; font-size:.72rem; font-weight:800; letter-spacing:.16em; text-transform:uppercase; margin-bottom:.45rem; }
+        .pb-cloud-heading h2 { font-family:'Bebas Neue',sans-serif; font-size:clamp(1.8rem,4vw,2.7rem); letter-spacing:.04em; }
+        .pb-cloud-status { max-width:34rem; color:#c4d8df; font-size:.88rem; line-height:1.55; }
+        .pb-cloud-auth { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
+        .pb-cloud-card { min-width:0; padding:1rem; border:1px solid rgba(255,255,255,.10); border-radius:16px; background:rgba(255,255,255,.035); }
+        .pb-cloud-card h3 { margin-bottom:.85rem; font-size:1.05rem; }
+        .pb-cloud-field { display:grid; gap:.35rem; margin-bottom:.75rem; }
+        .pb-cloud-field label { color:#c9d5dc; font-size:.8rem; font-weight:700; }
+        .pb-cloud-field input, .pb-cloud-field textarea, .pb-cloud-field select {
+            width:100%; min-width:0; padding:.75rem .85rem; border:1px solid rgba(255,255,255,.16);
+            border-radius:10px; color:#fff; background:#111827; font:inherit;
+        }
+        .pb-cloud-field input:focus-visible, .pb-cloud-field textarea:focus-visible, .pb-cloud-field select:focus-visible {
+            outline:3px solid #00fff7; outline-offset:2px;
+        }
+        .pb-cloud-button { display:inline-flex; align-items:center; justify-content:center; width:100%; min-height:44px;
+            padding:.7rem 1rem; border:0; border-radius:10px; color:#061318; background:#00fff7; font-weight:900; cursor:pointer; }
+        .pb-cloud-button:disabled { opacity:.55; cursor:not-allowed; }
+        .pb-cloud-message { margin:.75rem 0; padding:.7rem .8rem; border-radius:9px; font-size:.85rem; line-height:1.45; }
+        .pb-cloud-message[data-kind="error"] { color:#ffe4e4; background:rgba(220,38,38,.16); }
+        .pb-cloud-message[data-kind="success"] { color:#d1fae5; background:rgba(16,185,129,.14); }
+        .pb-cloud-message[data-kind="info"] { color:#dbeafe; background:rgba(59,130,246,.13); }
+        .pb-cloud-account { display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; padding:1rem; border-radius:14px; background:rgba(0,255,247,.07); border:1px solid rgba(0,255,247,.18); }
+        .pb-cloud-user { font-weight:800; }
+        .pb-cloud-user-handle { color:#a8bdc7; font-size:.82rem; }
+        .pb-cloud-small-button { border:1px solid rgba(255,255,255,.22); border-radius:9px; padding:.6rem .85rem; background:transparent; color:#fff; cursor:pointer; }
+        .pb-cloud-columns { display:grid; grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr); gap:1rem; margin-top:1rem; }
+        .pb-cloud-section-title { margin-bottom:.8rem; font-size:1.1rem; }
+        .pb-cloud-theme { padding:.7rem 0; border-bottom:1px solid rgba(255,255,255,.08); }
+        .pb-cloud-theme strong { color:#ffe79a; }
+        .pb-cloud-theme p { margin:.25rem 0; color:#c4d8df; font-size:.83rem; line-height:1.45; }
+        .pb-cloud-theme small { color:#9eb3bd; font-size:.75rem; }
+        .pb-cloud-entry { padding:1rem; margin-bottom:.75rem; border:1px solid rgba(255,255,255,.09); border-radius:13px; background:rgba(255,255,255,.035); }
+        .pb-cloud-entry-meta, .pb-cloud-entry-footer { display:flex; justify-content:space-between; align-items:center; gap:.7rem; flex-wrap:wrap; }
+        .pb-cloud-entry-meta strong { color:#00fff7; }
+        .pb-cloud-entry-meta span, .pb-cloud-entry-footer { color:#9fb4bd; font-size:.78rem; }
+        .pb-cloud-entry-body { margin:.8rem 0; font-size:1.04rem; line-height:1.55; overflow-wrap:anywhere; }
+        .pb-cloud-vote-count { color:#ffe79a; font-weight:800; }
+        .pb-cloud-vote { margin-top:.75rem; min-height:39px; padding:.5rem .8rem; border:1px solid rgba(0,255,247,.35); border-radius:9px; background:transparent; color:#d9ffff; font-weight:800; cursor:pointer; }
+        .pb-cloud-vote.is-voted { color:#081517; background:#00fff7; }
+        .pb-cloud-vote:disabled { opacity:.5; cursor:not-allowed; }
+        .pb-cloud-empty { padding:.8rem 0; color:#a9bdc6; font-size:.88rem; line-height:1.55; }
+        .pb-cloud-pending { margin-top:1rem; padding:1rem; border:1px solid rgba(255,215,0,.25); border-radius:12px; background:rgba(255,215,0,.06); }
+        .pb-cloud-pending h4 { margin-bottom:.5rem; color:#ffe79a; }
+        .pb-cloud-pending p { margin:.35rem 0; font-size:.85rem; line-height:1.4; }
+        @media (max-width:760px) {
+            .pb-cloud-auth, .pb-cloud-columns { grid-template-columns:1fr; }
+            .pb-cloud-section { width:calc(100% - 1rem); padding:1rem; }
+        }
+
     </style>
 <base target="_blank">
 <style id="accessibility-enhancements">
@@ -1130,7 +1193,93 @@
 
 <body>
     <div class="bg-animation"></div>
-    <div role="note" aria-label="Mode démonstration" style="padding:.65rem 1rem;text-align:center;background:rgba(255,215,0,.09);border-bottom:1px solid rgba(255,215,0,.28);color:#ffe79a;font-size:.82rem;line-height:1.5">DÉMO LOCALE — les punchlines et les votes sont enregistrés uniquement sur cet appareil. Aucun compte ni vote public n’est encore connecté à une base de données.</div>
+    <div role="note" aria-label="Mode démonstration" style="padding:.65rem 1rem;text-align:center;background:rgba(255,215,0,.09);border-bottom:1px solid rgba(255,215,0,.28);color:#ffe79a;font-size:.82rem;line-height:1.5">ESPACE DE DÉMONSTRATION — les cartes, statistiques et interactions sous cette zone sont des exemples enregistrés localement. Les vrais comptes, thèmes ouverts, punchlines publiées et votes partagés se trouvent dans l’Arène en ligne ci-dessus.</div>
+
+
+    <section class="pb-cloud-section" id="pb-cloud" aria-labelledby="pb-cloud-title">
+      <div class="pb-cloud-heading">
+        <div>
+          <p class="pb-cloud-kicker">Punchi Battle · Arène en ligne</p>
+          <h2 id="pb-cloud-title">La vraie arène commence ici</h2>
+        </div>
+        <p class="pb-cloud-status" id="pb-cloud-status" role="status" aria-live="polite">Connexion sécurisée à la base de données…</p>
+      </div>
+
+      <div class="pb-cloud-auth" id="pb-cloud-auth">
+        <form class="pb-cloud-card" id="pb-cloud-login">
+          <h3>Connexion</h3>
+          <div class="pb-cloud-field">
+            <label for="pb-cloud-login-email">Adresse e-mail</label>
+            <input id="pb-cloud-login-email" type="email" autocomplete="email" required maxlength="254">
+          </div>
+          <div class="pb-cloud-field">
+            <label for="pb-cloud-login-password">Mot de passe</label>
+            <input id="pb-cloud-login-password" type="password" autocomplete="current-password" required minlength="12">
+          </div>
+          <button class="pb-cloud-button" type="submit">Entrer dans l’arène</button>
+        </form>
+
+        <form class="pb-cloud-card" id="pb-cloud-signup">
+          <h3>Créer un compte MC</h3>
+          <div class="pb-cloud-field">
+            <label for="pb-cloud-signup-username">Nom de guerrier</label>
+            <input id="pb-cloud-signup-username" type="text" autocomplete="nickname" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" required>
+          </div>
+          <div class="pb-cloud-field">
+            <label for="pb-cloud-signup-email">Adresse e-mail</label>
+            <input id="pb-cloud-signup-email" type="email" autocomplete="email" maxlength="254" required>
+          </div>
+          <div class="pb-cloud-field">
+            <label for="pb-cloud-signup-password">Mot de passe (12 caractères minimum)</label>
+            <input id="pb-cloud-signup-password" type="password" autocomplete="new-password" minlength="12" required>
+          </div>
+          <button class="pb-cloud-button" type="submit">Créer mon compte</button>
+        </form>
+      </div>
+
+      <div class="pb-cloud-account" id="pb-cloud-account" hidden>
+        <div>
+          <div class="pb-cloud-user" id="pb-cloud-user"></div>
+          <div class="pb-cloud-user-handle" id="pb-cloud-user-handle"></div>
+        </div>
+        <button class="pb-cloud-small-button" id="pb-cloud-signout" type="button">Déconnexion</button>
+      </div>
+
+      <p class="pb-cloud-message" id="pb-cloud-auth-message" role="status" aria-live="polite" hidden></p>
+      <p class="pb-cloud-empty" id="pb-cloud-login-note">Les visiteurs peuvent consulter l’arène. Connecte-toi pour voter ou proposer une punchline lorsqu’un thème est ouvert.</p>
+
+      <div class="pb-cloud-columns">
+        <section class="pb-cloud-card" aria-labelledby="pb-cloud-theme-heading">
+          <h3 class="pb-cloud-section-title" id="pb-cloud-theme-heading">Thèmes ouverts</h3>
+          <div id="pb-cloud-themes"><p class="pb-cloud-empty">Chargement des thèmes…</p></div>
+        </section>
+        <section class="pb-cloud-card" aria-labelledby="pb-cloud-feed-heading">
+          <div class="pb-cloud-heading">
+            <h3 class="pb-cloud-section-title" id="pb-cloud-feed-heading">Punchlines publiées</h3>
+            <button class="pb-cloud-small-button" id="pb-cloud-refresh" type="button">Actualiser</button>
+          </div>
+          <div id="pb-cloud-entries"><p class="pb-cloud-empty">Chargement des participations…</p></div>
+        </section>
+      </div>
+
+      <div class="pb-cloud-pending" id="pb-cloud-pending" hidden></div>
+
+      <section class="pb-cloud-card" id="pb-cloud-entry-panel" style="margin-top:1rem" hidden aria-labelledby="pb-cloud-entry-heading">
+        <h3 class="pb-cloud-section-title" id="pb-cloud-entry-heading">Proposer une punchline</h3>
+        <form id="pb-cloud-entry-form">
+          <div class="pb-cloud-field">
+            <label for="pb-cloud-theme">Thème</label>
+            <select id="pb-cloud-theme" required></select>
+          </div>
+          <div class="pb-cloud-field">
+            <label for="pb-cloud-entry-body">Ta punchline (10 à 280 caractères)</label>
+            <textarea id="pb-cloud-entry-body" rows="3" minlength="10" maxlength="280" required placeholder="Fais parler les mots…"></textarea>
+          </div>
+          <button class="pb-cloud-button" type="submit">Envoyer pour modération</button>
+          <p class="pb-cloud-message" id="pb-cloud-entry-message" role="status" aria-live="polite" hidden></p>
+        </form>
+      </section>
+    </section>
 
     <!-- HEADER -->
     <header>
@@ -1448,6 +1597,7 @@
         <p>© 2026 <span>Punchi Battle</span> — L'Arène des Mots</p>
     </footer>
 
+    <script type="module" src="supabase.js"></script>
     <script>
         // ==================== DATA ====================
         const punchlines = [
