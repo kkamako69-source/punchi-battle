@@ -579,7 +579,12 @@ phoneAuthForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const usernameRaw = $("pb-cloud-phone-username").value.trim();
   const username = usernameCandidate(usernameRaw);
-  const phone = normalizeE164($("pb-cloud-phone-number").value);
+  const rawPhone = $("pb-cloud-phone-number").value.trim();
+  const dialCode = $("pb-cloud-phone-country").value;
+  const internationalPhone = rawPhone.startsWith("+")
+    ? rawPhone
+    : (dialCode ? dialCode + rawPhone.replace(/^0+/, "") : rawPhone);
+  const phone = normalizeE164(internationalPhone);
   const button = phoneAuthForm.querySelector("button[type=submit]");
 
   if (!usernameRaw || usernameRaw.length > 24 || !/^[a-z0-9_]{3,24}$/i.test(usernameRaw)) {
@@ -587,7 +592,7 @@ phoneAuthForm.addEventListener("submit", async (event) => {
     return;
   }
   if (!phone) {
-    setMessage(authMessage, "Saisis ton numéro au format international E.164, par exemple +242XXXXXXXXX ou +33XXXXXXXXX.", "error");
+    setMessage(authMessage, "Saisis ton numéro avec l’indicatif choisi ou directement au format international E.164 (ex. +242…, +243…, +33…).", "error");
     return;
   }
   if (!$("pb-cloud-phone-privacy-consent").checked) {
