@@ -1253,6 +1253,10 @@
             <label for="pb-cloud-signup-password">Mot de passe (12 caractères minimum)</label>
             <input id="pb-cloud-signup-password" type="password" autocomplete="new-password" minlength="12" required>
           </div>
+          <label class="pb-contact-consent">
+            <input id="pb-cloud-privacy-consent" type="checkbox" required>
+            <span>J’ai lu la <a class="pb-cloud-link" href="politique-confidentialite.html" target="_blank" rel="noopener">politique de confidentialité</a> et j’accepte l’utilisation de mes données pour mon compte et la sécurité de Punchi Battle. J’ai compris que l’hébergement principal de la base est situé à Paris, en France.</span>
+          </label>
           <button class="pb-cloud-button" type="submit">Créer mon compte</button>
         </form>
       </div>
@@ -1269,6 +1273,10 @@
           <label for="pb-cloud-phone-number">Numéro de téléphone international</label>
           <input id="pb-cloud-phone-number" type="tel" autocomplete="tel" inputmode="tel" placeholder="+242XXXXXXXXX ou +33XXXXXXXXX" maxlength="16" required>
         </div>
+        <label class="pb-contact-consent">
+          <input id="pb-cloud-phone-privacy-consent" type="checkbox" required>
+          <span>J’ai lu la <a class="pb-cloud-link" href="politique-confidentialite.html" target="_blank" rel="noopener">politique de confidentialité</a> et j’accepte l’utilisation de mes données pour mon compte et la sécurité de Punchi Battle, y compris l’hébergement principal à Paris.</span>
+        </label>
         <button class="pb-cloud-button" type="submit">Recevoir mon code SMS</button>
       </form>
       <div class="pb-phone-otp" id="pb-cloud-phone-code-panel" hidden>
@@ -1283,6 +1291,16 @@
       </div>
       <p class="pb-cloud-privacy-note">L’accès par SMS nécessite l’activation de l’authentification téléphone et d’un fournisseur SMS dans Supabase. Aucun fournisseur payant n’est activé automatiquement.</p>
       </div>
+
+      <form id="pb-cloud-existing-consent" class="pb-cloud-card" style="margin-top:1rem" hidden>
+        <h3>Confirme la politique de confidentialité</h3>
+        <p class="pb-cloud-privacy-note">La politique a été mise à jour. Pour déverrouiller les menus de ton compte, consulte la notice et confirme ton accord. Tes coordonnées privées restent séparées des profils publics.</p>
+        <label class="pb-contact-consent">
+          <input id="pb-cloud-existing-consent-checkbox" type="checkbox" required>
+          <span>J’ai lu et j’accepte la <a class="pb-cloud-link" href="politique-confidentialite.html" target="_blank" rel="noopener">politique de confidentialité</a> en vigueur.</span>
+        </label>
+        <button class="pb-cloud-button" type="submit">Accepter et ouvrir mon espace</button>
+      </form>
 
       <div class="pb-cloud-account" id="pb-cloud-account" hidden>
         <div>
