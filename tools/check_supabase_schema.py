@@ -14,6 +14,8 @@ RATE_LIMIT_LOCK_MIGRATION = ROOT / "supabase/migrations/20261124123000_serialize
 THEME_WINDOW_MIGRATION = ROOT / "supabase/migrations/20261124123500_filter_themes_by_open_window.sql"
 CONTACT_MIGRATION = ROOT / "supabase/migrations/20261124122000_private_contact_details.sql"
 CONSENT_MIGRATION = ROOT / "supabase/migrations/20261124130000_record_privacy_consent.sql"
+MEMBER_CONSENT_MIGRATION = ROOT / "supabase/migrations/20261124131000_require_current_member_consent.sql"
+ANON_PRIVILEGES_MIGRATION = ROOT / "supabase/migrations/20261124131500_revoke_inherited_anon_privileges.sql"
 SEED = ROOT / "supabase/seed.sql"
 
 TABLES = ("profiles", "themes", "entries", "votes", "comments", "reports")
@@ -35,64 +37,33 @@ REQUIRED_POLICIES = (
     "reports_submit_visible_target",
 )
 
-def fail(message: str) -> None:
-    print("ERREUR:", message, file=sys.stderr)
+
+def read_required(path: Path, label: str, errors: list[str]) -> str:
+    if not path.is_file():
+        errors.append(f"{label} manquant")
+        return ""
+    return path.read_text(encoding="utf-8").lower()
+
+
+def require_fragments(source: str, fragments: tuple[str, ...], label: str, errors: list[str]) -> None:
+    for fragment in fragments:
+        if fragment not in source:
+            errors.append(f"{label} : élément manquant ({fragment})")
+
 
 def main() -> int:
     errors: list[str] = []
-    if not MIGRATION.is_file():
-        errors.append("migration SQL manquante")
-        migration = ""
-    else:
-        migration = MIGRATION.read_text(encoding="utf-8").lower()
-
-    if not INDEX_MIGRATION.is_file():
-        errors.append("migration d'index complémentaires manquante")
-        index_migration = ""
-    else:
-        index_migration = INDEX_MIGRATION.read_text(encoding="utf-8").lower()
-
-    if not HARDENING_MIGRATION.is_file():
-        errors.append("migration de durcissement des écritures manquante")
-        hardening_migration = ""
-    else:
-        hardening_migration = HARDENING_MIGRATION.read_text(encoding="utf-8").lower()
-
-    if not COUNTER_MIGRATION.is_file():
-        errors.append("migration du compteur de votes privé manquante")
-        counter_migration = ""
-    else:
-        counter_migration = COUNTER_MIGRATION.read_text(encoding="utf-8").lower()
-
-    if not RATE_LIMIT_LOCK_MIGRATION.is_file():
-        errors.append("migration de verrouillage anti-concurrence manquante")
-        rate_limit_lock_migration = ""
-    else:
-        rate_limit_lock_migration = RATE_LIMIT_LOCK_MIGRATION.read_text(encoding="utf-8").lower()
-
-    if not THEME_WINDOW_MIGRATION.is_file():
-        errors.append("migration de visibilité des thèmes par fenêtre horaire manquante")
-        theme_window_migration = ""
-    else:
-        theme_window_migration = THEME_WINDOW_MIGRATION.read_text(encoding="utf-8").lower()
-
-    if not CONTACT_MIGRATION.is_file():
-        errors.append("migration de coordonnées privées manquante")
-        contact_migration = ""
-    else:
-        contact_migration = CONTACT_MIGRATION.read_text(encoding="utf-8").lower()
-
-    if not CONSENT_MIGRATION.is_file():
-        errors.append("migration de consentement versionné manquante")
-        consent_migration = ""
-    else:
-        consent_migration = CONSENT_MIGRATION.read_text(encoding="utf-8").lower()
-
-    if not SEED.is_file():
-        errors.append("catalogue seed SQL manquant")
-        seed = ""
-    else:
-        seed = SEED.read_text(encoding="utf-8").lower()
+    migration = read_required(MIGRATION, "migration SQL initiale", errors)
+    index_migration = read_required(INDEX_MIGRATION, "migration d'index complémentaires", errors)
+    hardening = read_required(HARDENING_MIGRATION, "migration de durcissement", errors)
+    counter = read_required(COUNTER_MIGRATION, "migration du compteur de votes privé", errors)
+    rate_lock = read_required(RATE_LIMIT_LOCK_MIGRATION, "migration de verrouillage anti-concurrence", errors)
+    theme_window = read_required(THEME_WINDOW_MIGRATION, "migration de visibilité des thèmes", errors)
+    contacts = read_required(CONTACT_MIGRATION, "migration de coordonnées privées", errors)
+    consents = read_required(CONSENT_MIGRATION, "migration du registre de consentement", errors)
+    member_consent = read_required(MEMBER_CONSENT_MIGRATION, "migration de consentement obligatoire", errors)
+    anon_privileges = read_required(ANON_PRIVILEGES_MIGRATION, "migration de révocation des privilèges anonymes", errors)
+    seed = read_required(SEED, "catalogue seed SQL", errors)
 
     for table in TABLES:
         if f"create table if not exists public.{table}" not in migration:
@@ -102,12 +73,12 @@ def main() -> int:
 
     for policy in REQUIRED_POLICIES:
         if policy not in migration:
-            errors.append(f"policy {policy} manquante")
+            errors.append(f"policy initiale {policy} manquante")
 
     if "security definer" in migration:
-        errors.append("fonction SECURITY DEFINER trouvée dans la migration publique")
+        errors.append("fonction SECURITY DEFINER trouvée dans la migration publique initiale")
     if "profiles_insert_self" not in migration or "id = (select auth.uid())" not in migration:
-        errors.append("création de profil non limitée à auth.uid()")
+        errors.append("création de profil initiale non limitée à auth.uid()")
     if "one_vote_per_user_per_entry unique (entry_id, voter_id)" not in migration:
         errors.append("contrainte d'unicité des votes manquante")
     if "t.is_active = true" not in migration or "t.closes_at > now()" not in migration:
@@ -115,42 +86,32 @@ def main() -> int:
     if "grant usage on schema public to anon, authenticated" not in migration:
         errors.append("GRANT USAGE explicite du schéma public manquant")
     if "grant select on public.profiles, public.themes, public.entries, public.comments to anon, authenticated" not in migration:
-        errors.append("GRANT de lecture explicite des tables exposées manquant")
-    if "grant select, insert, delete on public.votes to authenticated" not in migration:
-        errors.append("GRANT de votes explicite manquant")
-    if "grant insert on public.profiles to authenticated" not in migration:
-        errors.append("GRANT d'insertion des profils manquant")
-    if "grant select, insert on public.reports to authenticated" not in migration:
-        errors.append("GRANT de lecture/insertion des signalements manquant")
+        errors.append("GRANT initial de lecture documenté manquant")
     if "char_length(avatar_url) <= 2048" not in migration or "'^https://'" not in migration:
         errors.append("validation HTTPS/longueur avatar manquante")
     if "revoke all on function public.set_updated_at() from public, anon, authenticated" not in migration:
         errors.append("EXECUTE de la fonction trigger non révoqué pour les rôles publics")
-    if "create index if not exists votes_voter_created_idx" not in index_migration:
-        errors.append("index de clé étrangère votes_voter_id manquant")
-    if "create index if not exists comments_author_created_idx" not in index_migration:
-        errors.append("index de clé étrangère comments_author_id manquant")
+    require_fragments(index_migration, (
+        "create index if not exists votes_voter_created_idx",
+        "create index if not exists comments_author_created_idx",
+    ), "index des clés étrangères", errors)
 
-    required_hardening = (
+    require_fragments(hardening, (
         "revoke insert on public.profiles from authenticated",
         "grant insert (id, username, display_name) on public.profiles to authenticated",
         "revoke insert on public.entries from authenticated",
         "grant insert (author_id, theme_id, body) on public.entries to authenticated",
         "revoke insert on public.votes from authenticated",
         "grant insert (entry_id, voter_id) on public.votes to authenticated",
-        "grant delete on public.comments to authenticated",
         "grant insert (entry_id, author_id, body) on public.comments to authenticated",
         "grant insert (reporter_id, target_type, target_id, category, details) on public.reports to authenticated",
         "comments_delete_own_pending",
         "create trigger entries_submission_rate_limit",
         "create trigger comments_submission_rate_limit",
         "revoke all on function public.enforce_submission_rate_limit() from public, anon, authenticated",
-    )
-    for fragment in required_hardening:
-        if fragment not in hardening_migration:
-            errors.append(f"durcissement SQL manquant : {fragment}")
+    ), "durcissement des écritures", errors)
 
-    required_counter = (
+    require_fragments(counter, (
         "add column if not exists vote_count bigint not null default 0",
         "create schema if not exists private",
         "revoke all on schema private from public, anon, authenticated",
@@ -161,29 +122,91 @@ def main() -> int:
         "revoke all on function private.sync_entry_vote_count() from public, anon, authenticated",
         "create trigger votes_sync_entry_vote_count",
         "drop view if exists public.entry_vote_totals",
-    )
-    for fragment in required_counter:
-        if fragment not in counter_migration:
-            errors.append(f"compteur de votes sécurisé manquant : {fragment}")
-    # The earlier migration created this view; the next migration must remove it.
-    # Verify the final database separately through Supabase advisors and pg_views.
+    ), "compteur de votes sécurisé", errors)
+
+    require_fragments(rate_lock, (
+        "pg_catalog.pg_advisory_xact_lock",
+        "pg_catalog.hashtextextended",
+        "set search_path = ''",
+        "revoke all on function public.enforce_submission_rate_limit() from public, anon, authenticated",
+    ), "verrou transactionnel anti-concurrence", errors)
+
+    require_fragments(theme_window, (
+        "create policy themes_read_active on public.themes",
+        "is_active = true",
+        "opens_at <= now()",
+        "closes_at > now()",
+    ), "visibilité des thèmes par fenêtre horaire", errors)
+
+    require_fragments(contacts, (
+        "create table if not exists public.profile_contacts",
+        "alter table public.profile_contacts enable row level security",
+        "profile_contacts_select_self",
+        "profile_contacts_insert_self",
+        "profile_contacts_update_self",
+        "profile_contacts_delete_self",
+        "profile_contacts_phone_e164",
+        "profile_contacts_country_iso2",
+        "profile_contacts_consent_required",
+        "revoke all on public.profile_contacts from public, anon, authenticated",
+        "grant select, delete on public.profile_contacts to authenticated",
+        "grant insert (user_id, backup_email, phone_e164, country_iso2)",
+        "grant update (backup_email, phone_e164, country_iso2)",
+        "revoke all on function public.stamp_profile_contact_change() from public, anon, authenticated",
+    ), "stockage privé des coordonnées", errors)
+
+    require_fragments(consents, (
+        "create table if not exists public.account_consents",
+        "alter table public.account_consents enable row level security",
+        "account_consents_select_self",
+        "account_consents_insert_self",
+        "unique (user_id, consent_code, policy_version)",
+        "grant select on public.account_consents to authenticated",
+        "grant insert (user_id, consent_code, policy_version)",
+    ), "registre de consentement append-only", errors)
+
+    require_fragments(member_consent, (
+        "profiles_read_members",
+        "themes_read_active",
+        "entries_read_published_or_own",
+        "votes_read_own",
+        "comments_read_published_or_own",
+        "reports_read_own",
+        "profile_contacts_select_self",
+        "policy_version = 'pb-privacy-2026-11-v1'",
+        "revoke select on public.profiles, public.themes, public.entries, public.comments from anon",
+    ), "obligation de consentement dans RLS", errors)
+
+    require_fragments(anon_privileges, (
+        "revoke all on table",
+        "public.profiles",
+        "public.profile_contacts",
+        "public.account_consents",
+        "from public, anon",
+        "grant select on public.profiles to authenticated",
+        "grant select, insert, delete on public.votes to authenticated",
+        "grant select, insert on public.reports to authenticated",
+    ), "privilèges minimaux sans accès anonyme", errors)
+
+    if "create view public.entry_vote_totals" in hardening:
+        errors.append("vue publique privilégiée de votes toujours présente")
+
     if "is_active)\nvalues" not in seed or ", false)" not in seed:
         errors.append("les thèmes de départ doivent rester inactifs par défaut")
 
     if errors:
         for error in errors:
-            fail(error)
+            print("ERREUR:", error, file=sys.stderr)
         return 1
 
     print(
-        "OK : "
-        + str(len(TABLES) + 2)
-        + " tables, "
-        + str(len(REQUIRED_POLICIES) + 1 + 4 + 2)
-        + " policies attendues, coordonnées privées, consentement versionné, privilèges limités, anti-spam et compteurs sécurisés vérifiés."
+        "OK : 8 tables, 22 policies attendues, RLS, consentement versionné, "
+        "coordonnées privées, absence d'accès anonyme, privilèges limités, "
+        "anti-spam, compteur de votes privé et index vérifiés."
     )
-    print("NOTE : vérification statique uniquement ; les tests RLS avec un visiteur et plusieurs comptes réels restent nécessaires.")
+    print("NOTE : vérification statique ; les parcours Auth/SMS et tests RLS avec de vrais comptes restent nécessaires.")
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
