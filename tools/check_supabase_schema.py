@@ -17,6 +17,7 @@ CONSENT_MIGRATION = ROOT / "supabase/migrations/20261124130000_record_privacy_co
 MEMBER_CONSENT_MIGRATION = ROOT / "supabase/migrations/20261124131000_require_current_member_consent.sql"
 ANON_PRIVILEGES_MIGRATION = ROOT / "supabase/migrations/20261124131500_revoke_inherited_anon_privileges.sql"
 LEADERBOARD_MIGRATION = ROOT / "supabase/migrations/20261124132000_member_leaderboard_view.sql"
+LEADERBOARD_RANK_MIGRATION = ROOT / "supabase/migrations/20261124132500_add_member_leaderboard_rank.sql"
 SEED = ROOT / "supabase/seed.sql"
 
 TABLES = ("profiles", "themes", "entries", "votes", "comments", "reports")
@@ -65,6 +66,7 @@ def main() -> int:
     member_consent = read_required(MEMBER_CONSENT_MIGRATION, "migration de consentement obligatoire", errors)
     anon_privileges = read_required(ANON_PRIVILEGES_MIGRATION, "migration de révocation des privilèges anonymes", errors)
     leaderboard = read_required(LEADERBOARD_MIGRATION, "migration du classement membre", errors)
+    leaderboard_rank = read_required(LEADERBOARD_RANK_MIGRATION, "migration du rang membre", errors)
     seed = read_required(SEED, "catalogue seed SQL", errors)
 
     for table in TABLES:
@@ -202,6 +204,15 @@ def main() -> int:
         "grant select on public.member_leaderboard to authenticated",
     ), "classement calculé avec RLS", errors)
 
+    require_fragments(leaderboard_rank, (
+        "create or replace view public.member_leaderboard",
+        "with (security_invoker = true)",
+        "row_number() over",
+        "as rank_number",
+        "revoke all on public.member_leaderboard from public, anon, authenticated",
+        "grant select on public.member_leaderboard to authenticated",
+    ), "rang exact du membre", errors)
+
     if "is_active)\nvalues" not in seed or ", false)" not in seed:
         errors.append("les thèmes de départ doivent rester inactifs par défaut")
 
@@ -213,7 +224,7 @@ def main() -> int:
     print(
         "OK : 8 tables, 22 policies attendues, RLS, consentement versionné, "
         "coordonnées privées, absence d'accès anonyme, privilèges limités, "
-        "anti-spam, compteur de votes privé et index vérifiés."
+        "anti-spam, compteur de votes privé, classement et rang membre vérifiés."
     )
     print("NOTE : vérification statique ; les parcours Auth/SMS et tests RLS avec de vrais comptes restent nécessaires.")
     return 0
