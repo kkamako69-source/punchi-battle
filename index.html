@@ -2119,6 +2119,10 @@
 
         // ==================== VOTE & SUBMIT ====================
         function vote(id) {
+            if (window.PunchiBattleAuth?.isAuthenticated !== true) {
+                navigateTo('battles');
+                return;
+            }
             const card = punchlines.find(p => p.id === id);
             if (!card) return;
             
@@ -2137,6 +2141,10 @@
         }
 
         function envoyer() {
+            if (window.PunchiBattleAuth?.isAuthenticated !== true) {
+                navigateTo('participate');
+                return;
+            }
             const pseudo = document.getElementById('pseudo').value.trim();
             const texte = document.getElementById('texte').value.trim();
             const message = document.getElementById('message');
