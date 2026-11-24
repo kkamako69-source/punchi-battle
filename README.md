@@ -38,6 +38,7 @@ Voir [Configuration Supabase](supabase/CONFIGURATION.md) et [Politique de confid
 - `supabase.js` : client navigateur épinglé à `@supabase/supabase-js@2.119.2`, avec clé publishable uniquement.
 - `supabase/migrations/` : douze migrations SQL versionnées et appliquées au projet Supabase.
 - `supabase/seed.sql` : six thèmes de départ désactivés.
+- `supabase/database.types.ts` : types TypeScript générés à partir du schéma live.
 - `supabase/README.md` : architecture réelle, sécurité, privilèges et état.
 - `supabase/CONFIGURATION.md` : URL Auth, e-mail, SMS, CAPTCHA, modération et lancement.
 - `politique-confidentialite.html` : notice provisoire à compléter et valider.
@@ -69,4 +70,5 @@ GitHub Actions lance les contrôles HTML, JavaScript, module Supabase, schéma e
 - [Site](https://kkamako69-source.github.io/punchi-battle/)
 - [Supabase](https://supabase.com/dashboard/project/ppuhpuuuxohokuzfctpq)
 - [Audit continu Supabase](https://supabase.com/dashboard/project/ppuhpuuuxohokuzfctpq/explorer/notebook/409399d0-c7c0-4b40-a58c-7fa04c74025d)
+- [Audit Membres & confidentialité](https://supabase.com/dashboard/project/ppuhpuuuxohokuzfctpq/explorer/notebook/a142201c-92b8-4405-b69a-d71c9e15ddd0)
 - [Politique de confidentialité](politique-confidentialite.html)
