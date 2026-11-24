@@ -39,6 +39,12 @@ const phoneVerifyForm = $("pb-cloud-phone-verify");
 const contactForm = $("pb-cloud-contact-form");
 const contactMessage = $("pb-cloud-contact-message");
 const accountConsentForm = $("pb-cloud-existing-consent");
+const profileForm = $("pb-cloud-profile-form");
+const profileMessage = $("pb-cloud-profile-message");
+const recoveryRequestForm = $("pb-cloud-recovery-request");
+const passwordRecoveryForm = $("pb-cloud-password-update");
+const recoveryRequestMessage = $("pb-cloud-recovery-request-message");
+const passwordRecoveryMessage = $("pb-cloud-password-update-message");
 const PRIVACY_POLICY_VERSION = "PB-PRIVACY-2026-11-V1";
 
 let currentUser = null;
@@ -182,11 +188,13 @@ async function loadPrivateContacts() {
 
 function renderSession() {
   const hasSession = Boolean(currentUser);
-  const isSignedIn = Boolean(currentUser && privacyAccepted && profileReady);
-  authForms.hidden = hasSession;
-  phoneAuthArea.hidden = hasSession;
-  accountPanel.hidden = !hasSession;
-  accountConsentForm.hidden = !hasSession || privacyAccepted;
+  const isSignedIn = Boolean(currentUser && privacyAccepted && profileReady && !passwordRecoveryPending);
+  authForms.hidden = hasSession || passwordRecoveryPending;
+  phoneAuthArea.hidden = hasSession || passwordRecoveryPending;
+  accountPanel.hidden = !hasSession || passwordRecoveryPending;
+  accountConsentForm.hidden = !hasSession || privacyAccepted || passwordRecoveryPending;
+  recoveryRequestForm.hidden = hasSession || !recoveryRequestForm.dataset.open;
+  passwordRecoveryForm.hidden = !passwordRecoveryPending;
   $("pb-cloud-user").textContent = isSignedIn
     ? (currentProfile?.display_name || currentProfile?.username || currentUser.email || currentUser.phone || "Membre")
     : "";
@@ -197,6 +205,15 @@ function renderSession() {
   $("pb-cloud-login-note").hidden = isSignedIn;
   if (memberContent) memberContent.hidden = !isSignedIn;
 
+  if ($("pb-cloud-profile-form") && currentProfile && currentUser) {
+    if (profileForm.dataset.userId !== currentUser.id) {
+      $("pb-cloud-profile-username").value = currentProfile.username || "";
+      $("pb-cloud-profile-display-name").value = currentProfile.display_name || "";
+      $("pb-cloud-profile-bio").value = currentProfile.bio || "";
+      profileForm.dataset.userId = currentUser.id;
+      profileForm.dataset.dirty = "false";
+    }
+  }
   if ($("pb-cloud-profile-name")) {
     $("pb-cloud-profile-name").textContent =
       currentProfile?.display_name || currentProfile?.username || "Ton nom de guerrier";
@@ -481,6 +498,75 @@ async function syncSession(session) {
   if (profileReady) showMemberView(activeMemberView || "arena");
 }
 
+$("pb-cloud-forgot-password").addEventListener("click", () => {
+  recoveryRequestForm.dataset.open = "true";
+  recoveryRequestForm.hidden = false;
+  loginForm.hidden = true;
+  signupForm.hidden = true;
+  phoneAuthArea.hidden = true;
+  setMessage(recoveryRequestMessage, "", "info");
+  $("pb-cloud-recovery-email").value = $("pb-cloud-login-email").value.trim();
+  $("pb-cloud-recovery-email").focus();
+});
+
+$("pb-cloud-recovery-cancel").addEventListener("click", () => {
+  recoveryRequestForm.dataset.open = "false";
+  recoveryRequestForm.hidden = true;
+  loginForm.hidden = false;
+  signupForm.hidden = false;
+  phoneAuthArea.hidden = !currentUser;
+});
+
+recoveryRequestForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const email = $("pb-cloud-recovery-email").value.trim();
+  const button = recoveryRequestForm.querySelector("button[type=submit]");
+  button.disabled = true;
+  setMessage(recoveryRequestMessage, "Envoi de la demande de récupération…", "info");
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectUrl()
+    });
+    if (error) throw error;
+    setMessage(recoveryRequestMessage, "Si cette adresse possède un compte, un lien de récupération sera envoyé. Vérifie aussi les courriers indésirables.", "success");
+  } catch (error) {
+    setMessage(recoveryRequestMessage, error.message || "Impossible d’envoyer le lien de récupération. Vérifie la configuration e-mail.", "error");
+  } finally {
+    button.disabled = false;
+  }
+});
+
+passwordRecoveryForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const password = $("pb-cloud-new-password").value;
+  const confirmation = $("pb-cloud-confirm-password").value;
+  const button = passwordRecoveryForm.querySelector("button[type=submit]");
+  if (password.length < 12) {
+    setMessage(passwordRecoveryMessage, "Le nouveau mot de passe doit contenir au moins 12 caractères.", "error");
+    return;
+  }
+  if (password !== confirmation) {
+    setMessage(passwordRecoveryMessage, "Les deux mots de passe ne correspondent pas.", "error");
+    return;
+  }
+
+  button.disabled = true;
+  setMessage(passwordRecoveryMessage, "Mise à jour du mot de passe…", "info");
+  try {
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) throw error;
+    passwordRecoveryPending = false;
+    passwordRecoveryForm.reset();
+    window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+    await syncSession({ user: currentUser });
+    setMessage(authMessage, "Mot de passe modifié. Ton compte est sécurisé ; tu peux continuer.", "success");
+  } catch (error) {
+    setMessage(passwordRecoveryMessage, error.message || "Impossible de modifier le mot de passe.", "error");
+  } finally {
+    button.disabled = false;
+  }
+});
+
 loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const email = $("pb-cloud-login-email").value.trim();
@@ -526,8 +612,7 @@ signupForm.addEventListener("submit", async (event) => {
       password,
       options: {
         data: {
-          username,
-          display_name: usernameRaw.slice(0, 60),
+          ...(username ? { username, display_name: usernameRaw.slice(0, 60) } : {}),
           pb_privacy_version: PRIVACY_POLICY_VERSION,
           pb_privacy_accepted: true
         },
@@ -576,6 +661,53 @@ accountConsentForm.addEventListener("submit", async (event) => {
   }
 });
 
+profileForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!currentUser || !profileReady || passwordRecoveryPending) {
+    setMessage(profileMessage, "Connecte-toi pour modifier ton profil.", "error");
+    return;
+  }
+
+  const username = $("pb-cloud-profile-username").value.trim().toLowerCase();
+  const displayName = $("pb-cloud-profile-display-name").value.trim();
+  const bio = $("pb-cloud-profile-bio").value.trim();
+
+  if (!/^[a-z0-9_]{3,24}$/.test(username)) {
+    setMessage(profileMessage, "Le pseudo doit contenir 3 à 24 caractères : minuscules, chiffres ou _.", "error");
+    return;
+  }
+  if (displayName.length < 2 || displayName.length > 60) {
+    setMessage(profileMessage, "Le nom d’affichage doit contenir entre 2 et 60 caractères.", "error");
+    return;
+  }
+  if (bio.length > 280) {
+    setMessage(profileMessage, "La biographie ne peut pas dépasser 280 caractères.", "error");
+    return;
+  }
+
+  const button = profileForm.querySelector("button[type=submit]");
+  button.disabled = true;
+  setMessage(profileMessage, "Enregistrement du profil…", "info");
+  try {
+    const { data, error } = await supabase
+      .from("profiles")
+      .update({ username, display_name: displayName, bio })
+      .eq("id", currentUser.id)
+      .select("id, username, display_name, bio, avatar_url")
+      .single();
+    if (error) throw error;
+    currentProfile = data;
+    profileForm.dataset.userId = currentUser.id;
+    renderSession();
+    setMessage(profileMessage, "Profil mis à jour.", "success");
+    await loadCloudData();
+  } catch (error) {
+    setMessage(profileMessage, error.message || "Impossible d’enregistrer le profil. Vérifie notamment que ce pseudo est disponible.", "error");
+  } finally {
+    button.disabled = false;
+  }
+});
+
 phoneAuthForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const usernameRaw = $("pb-cloud-phone-username").value.trim();
@@ -588,8 +720,8 @@ phoneAuthForm.addEventListener("submit", async (event) => {
   const phone = normalizeE164(internationalPhone);
   const button = phoneAuthForm.querySelector("button[type=submit]");
 
-  if (!usernameRaw || usernameRaw.length > 24 || !/^[a-z0-9_]{3,24}$/i.test(usernameRaw)) {
-    setMessage(authMessage, "Choisis un pseudo de 3 à 24 caractères : lettres, chiffres ou _.", "error");
+  if (usernameRaw && (usernameRaw.length > 24 || !/^[a-z0-9_]{3,24}$/i.test(usernameRaw))) {
+    setMessage(authMessage, "Le pseudo doit contenir 3 à 24 caractères : lettres, chiffres ou _.", "error");
     return;
   }
   if (!phone) {
@@ -824,11 +956,16 @@ $("pb-cloud-refresh").addEventListener("click", () => {
 
 async function initialize() {
   try {
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    passwordRecoveryPending = hashParams.get("type") === "recovery";
     const { data, error } = await supabase.auth.getSession();
     if (error) throw error;
     await syncSession(data.session);
 
-    supabase.auth.onAuthStateChange((_event, session) => {
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        passwordRecoveryPending = true;
+      }
       // Defer database calls until Supabase has released its internal auth lock.
       Promise.resolve().then(() => syncSession(session));
     });
