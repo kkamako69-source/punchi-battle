@@ -8,6 +8,8 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 MIGRATION = ROOT / "supabase/migrations/202611210001_punchi_battle_schema.sql"
 INDEX_MIGRATION = ROOT / "supabase/migrations/20261124095000_add_fk_owner_indexes.sql"
+HARDENING_MIGRATION = ROOT / "supabase/migrations/20261124121800_harden_write_paths_and_vote_totals.sql"
+COUNTER_MIGRATION = ROOT / "supabase/migrations/20261124122000_replace_vote_view_with_private_counter.sql"
 SEED = ROOT / "supabase/seed.sql"
 
 TABLES = ("profiles", "themes", "entries", "votes", "comments", "reports")
@@ -25,6 +27,7 @@ REQUIRED_POLICIES = (
     "votes_delete_own",
     "comments_read_published_or_own",
     "comments_submit_pending",
+    "comments_delete_own_pending",
     "reports_read_own",
     "reports_submit_visible_target",
 )
@@ -45,6 +48,18 @@ def main() -> int:
         index_migration = ""
     else:
         index_migration = INDEX_MIGRATION.read_text(encoding="utf-8").lower()
+
+    if not HARDENING_MIGRATION.is_file():
+        errors.append("migration de durcissement des écritures manquante")
+        hardening_migration = ""
+    else:
+        hardening_migration = HARDENING_MIGRATION.read_text(encoding="utf-8").lower()
+
+    if not COUNTER_MIGRATION.is_file():
+        errors.append("migration du compteur de votes privé manquante")
+        counter_migration = ""
+    else:
+        counter_migration = COUNTER_MIGRATION.read_text(encoding="utf-8").lower()
 
     if not SEED.is_file():
         errors.append("catalogue seed SQL manquant")
@@ -88,6 +103,40 @@ def main() -> int:
         errors.append("index de clé étrangère votes_voter_id manquant")
     if "create index if not exists comments_author_created_idx" not in index_migration:
         errors.append("index de clé étrangère comments_author_id manquant")
+
+    required_hardening = (
+        "revoke insert on public.profiles from authenticated",
+        "grant insert (id, username, display_name) on public.profiles to authenticated",
+        "revoke insert on public.entries from authenticated",
+        "grant insert (author_id, theme_id, body) on public.entries to authenticated",
+        "revoke insert on public.votes from authenticated",
+        "grant insert (entry_id, voter_id) on public.votes to authenticated",
+        "grant delete on public.comments to authenticated",
+        "create trigger entries_submission_rate_limit",
+        "create trigger comments_submission_rate_limit",
+        "revoke all on function public.enforce_submission_rate_limit() from public, anon, authenticated",
+    )
+    for fragment in required_hardening:
+        if fragment not in hardening_migration:
+            errors.append(f"durcissement SQL manquant : {fragment}")
+
+    required_counter = (
+        "add column if not exists vote_count bigint not null default 0",
+        "create schema if not exists private",
+        "revoke all on schema private from public, anon, authenticated",
+        "create or replace function private.sync_entry_vote_count()",
+        "security definer",
+        "set search_path = ''",
+        "auth.uid()",
+        "revoke all on function private.sync_entry_vote_count() from public, anon, authenticated",
+        "create trigger votes_sync_entry_vote_count",
+        "drop view if exists public.entry_vote_totals",
+    )
+    for fragment in required_counter:
+        if fragment not in counter_migration:
+            errors.append(f"compteur de votes sécurisé manquant : {fragment}")
+    if "create view public.entry_vote_totals" in hardening_migration:
+        errors.append("vue publique privilégiée de votes toujours présente")
     if "is_active)\nvalues" not in seed or ", false)" not in seed:
         errors.append("les thèmes de départ doivent rester inactifs par défaut")
 
@@ -101,7 +150,7 @@ def main() -> int:
         + str(len(TABLES))
         + " tables, "
         + str(len(REQUIRED_POLICIES))
-        + " policies attendues, contraintes, validations d’URL, GRANT et index vérifiés."
+        + " policies attendues, privilèges limités, anti-spam, compteur de votes privé et index vérifiés."
     )
     print("NOTE : vérification statique uniquement ; une vraie migration et des tests RLS restent nécessaires.")
     return 0
