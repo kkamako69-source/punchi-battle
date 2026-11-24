@@ -134,8 +134,8 @@ async function ensureProfile(user) {
 }
 
 function normalizeE164(value) {
-  const compact = String(value || "").replace(/[\\s().-]/g, "");
-  return /^\\+[1-9][0-9]{7,14}$/.test(compact) ? compact : "";
+  const compact = String(value || "").replace(/[\s().-]/g, "");
+  return /^\+[1-9][0-9]{7,14}$/.test(compact) ? compact : "";
 }
 
 function renderProtectedNavigation() {
@@ -461,7 +461,7 @@ phoneVerifyForm.addEventListener("submit", async (event) => {
   const token = $("pb-cloud-phone-code").value.trim();
   const button = phoneVerifyForm.querySelector("button[type=submit]");
 
-  if (!pendingPhone || !/^\\d{6}$/.test(token)) {
+  if (!pendingPhone || !/^\d{6}$/.test(token)) {
     setMessage(authMessage, "Le code reçu doit contenir exactement 6 chiffres.", "error");
     return;
   }
@@ -501,7 +501,7 @@ contactForm.addEventListener("submit", async (event) => {
   const country = $("pb-contact-country").value.trim().toUpperCase();
   const hasContact = Boolean(backupEmail || phone);
 
-  if (backupEmail && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(backupEmail)) {
+  if (backupEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(backupEmail)) {
     setMessage(contactMessage, "Adresse e-mail secondaire invalide.", "error");
     return;
   }
