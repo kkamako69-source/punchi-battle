@@ -11,6 +11,7 @@ INDEX_MIGRATION = ROOT / "supabase/migrations/20261124095000_add_fk_owner_indexe
 HARDENING_MIGRATION = ROOT / "supabase/migrations/20261124121800_harden_write_paths_and_vote_totals.sql"
 COUNTER_MIGRATION = ROOT / "supabase/migrations/20261124122000_replace_vote_view_with_private_counter.sql"
 RATE_LIMIT_LOCK_MIGRATION = ROOT / "supabase/migrations/20261124123000_serialize_rate_limits.sql"
+THEME_WINDOW_MIGRATION = ROOT / "supabase/migrations/20261124123500_filter_themes_by_open_window.sql"
 SEED = ROOT / "supabase/seed.sql"
 
 TABLES = ("profiles", "themes", "entries", "votes", "comments", "reports")
@@ -66,6 +67,12 @@ def main() -> int:
         rate_limit_lock_migration = ""
     else:
         rate_limit_lock_migration = RATE_LIMIT_LOCK_MIGRATION.read_text(encoding="utf-8").lower()
+
+    if not THEME_WINDOW_MIGRATION.is_file():
+        errors.append("migration de visibilité des thèmes par fenêtre horaire manquante")
+        theme_window_migration = ""
+    else:
+        theme_window_migration = THEME_WINDOW_MIGRATION.read_text(encoding="utf-8").lower()
 
     if not SEED.is_file():
         errors.append("catalogue seed SQL manquant")
