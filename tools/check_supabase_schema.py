@@ -10,6 +10,7 @@ MIGRATION = ROOT / "supabase/migrations/202611210001_punchi_battle_schema.sql"
 INDEX_MIGRATION = ROOT / "supabase/migrations/20261124095000_add_fk_owner_indexes.sql"
 HARDENING_MIGRATION = ROOT / "supabase/migrations/20261124121800_harden_write_paths_and_vote_totals.sql"
 COUNTER_MIGRATION = ROOT / "supabase/migrations/20261124122000_replace_vote_view_with_private_counter.sql"
+RATE_LIMIT_LOCK_MIGRATION = ROOT / "supabase/migrations/20261124123000_serialize_rate_limits.sql"
 SEED = ROOT / "supabase/seed.sql"
 
 TABLES = ("profiles", "themes", "entries", "votes", "comments", "reports")
@@ -59,6 +60,12 @@ def main() -> int:
         counter_migration = ""
     else:
         counter_migration = COUNTER_MIGRATION.read_text(encoding="utf-8").lower()
+
+    if not RATE_LIMIT_LOCK_MIGRATION.is_file():
+        errors.append("migration de verrouillage anti-concurrence manquante")
+        rate_limit_lock_migration = ""
+    else:
+        rate_limit_lock_migration = RATE_LIMIT_LOCK_MIGRATION.read_text(encoding="utf-8").lower()
 
     if not SEED.is_file():
         errors.append("catalogue seed SQL manquant")
