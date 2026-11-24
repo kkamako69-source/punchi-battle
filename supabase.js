@@ -29,12 +29,23 @@ const themesNode = $("pb-cloud-themes");
 const entriesNode = $("pb-cloud-entries");
 const pendingNode = $("pb-cloud-pending");
 const themeSelect = $("pb-cloud-theme");
+const memberContent = $("pb-cloud-member-content");
+const phoneAuthForm = $("pb-cloud-phone-form");
+const phoneCodePanel = $("pb-cloud-phone-code-panel");
+const phoneVerifyForm = $("pb-cloud-phone-verify");
+const contactForm = $("pb-cloud-contact-form");
+const contactMessage = $("pb-cloud-contact-message");
 
 let currentUser = null;
 let currentProfile = null;
+let currentContacts = null;
+let profileReady = false;
+let pendingPhone = "";
 let activeThemes = [];
 let userVotes = new Set();
 let loadingEntries = false;
+
+window.PunchiBattleAuth = { isAuthenticated: false };
 
 function escapeHTML(value) {
   return String(value ?? "").replace(/[&<>"']/g, (character) => ({
@@ -122,8 +133,56 @@ async function ensureProfile(user) {
   return data;
 }
 
+function normalizeE164(value) {
+  const compact = String(value || "").replace(/[\\s().-]/g, "");
+  return /^\\+[1-9][0-9]{7,14}$/.test(compact) ? compact : "";
+}
+
+function renderProtectedNavigation() {
+  const unlocked = Boolean(currentUser && profileReady);
+  window.PunchiBattleAuth = { isAuthenticated: unlocked };
+  document.body.classList.toggle("pb-authenticated", unlocked);
+
+  document.querySelectorAll(".nav-btn[data-auth-required='true']").forEach((button) => {
+    button.setAttribute("aria-disabled", unlocked ? "false" : "true");
+    button.title = unlocked ? "" : "Inscris-toi ou connecte-toi pour ouvrir ce menu.";
+  });
+
+  if (!unlocked) {
+    const active = document.querySelector(".section-view.active");
+    if (active && active.id !== "section-home" && typeof window.navigateTo === "function") {
+      window.navigateTo("home");
+    }
+  }
+}
+
+async function loadPrivateContacts() {
+  if (!currentUser) {
+    currentContacts = null;
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("profile_contacts")
+    .select("backup_email, phone_e164, country_iso2")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+
+  if (error) throw error;
+  currentContacts = data || null;
+
+  $("pb-contact-email").value = currentContacts?.backup_email || "";
+  $("pb-contact-phone").value = currentContacts?.phone_e164 || "";
+  $("pb-contact-country").value = currentContacts?.country_iso2 || "CG";
+  $("pb-contact-consent").checked = false;
+
+  const primary = currentUser.email || currentUser.phone || "Coordonnée de connexion non disponible";
+  $("pb-contact-primary").textContent = primary;
+  $("pb-contact-primary-type").textContent = currentUser.email ? "E-mail du compte" : "Téléphone du compte";
+}
+
 function renderSession() {
-  const isSignedIn = Boolean(currentUser);
+  const isSignedIn = Boolean(currentUser && profileReady);
   authForms.hidden = isSignedIn;
   accountPanel.hidden = !isSignedIn;
   $("pb-cloud-user").textContent = isSignedIn
@@ -134,6 +193,8 @@ function renderSession() {
     : "";
   $("pb-cloud-entry-panel").hidden = !isSignedIn || activeThemes.length === 0;
   $("pb-cloud-login-note").hidden = isSignedIn;
+  if (memberContent) memberContent.hidden = !isSignedIn;
+  renderProtectedNavigation();
 }
 
 function renderThemes() {
@@ -192,6 +253,15 @@ function renderEntries(entries) {
 
 async function loadCloudData() {
   if (loadingEntries) return;
+  if (!currentUser || !profileReady) {
+    activeThemes = [];
+    userVotes = new Set();
+    renderThemes();
+    renderEntries([]);
+    if (memberContent) memberContent.hidden = true;
+    statusNode.textContent = "Inscris-toi ou connecte-toi pour accéder aux menus et à l’arène.";
+    return;
+  }
   loadingEntries = true;
   try {
     const { data: themes, error: themesError } = await supabase
@@ -263,16 +333,24 @@ async function loadCloudData() {
 async function syncSession(session) {
   currentUser = session?.user ?? null;
   currentProfile = null;
+  currentContacts = null;
+  profileReady = false;
   renderSession();
 
   if (currentUser) {
     try {
       await ensureProfile(currentUser);
+      await loadPrivateContacts();
+      profileReady = true;
       renderSession();
     } catch (error) {
       console.error("Profile initialization error:", error);
-      setMessage(authMessage, "Connexion réussie, mais le profil n’a pas pu être initialisé : " + (error.message || "erreur inconnue"), "error");
+      setMessage(authMessage, "Ton compte est reconnu, mais la préparation du profil a échoué : " + (error.message || "erreur inconnue"), "error");
     }
+  } else {
+    phoneCodePanel.hidden = true;
+    pendingPhone = "";
+    if (contactForm) contactForm.reset();
   }
 
   await loadCloudData();
@@ -332,6 +410,152 @@ signupForm.addEventListener("submit", async (event) => {
     signupForm.reset();
   } catch (error) {
     setMessage(authMessage, error.message || "Inscription impossible.", "error");
+  } finally {
+    button.disabled = false;
+  }
+});
+
+phoneAuthForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const usernameRaw = $("pb-cloud-phone-username").value.trim();
+  const username = usernameCandidate(usernameRaw);
+  const phone = normalizeE164($("pb-cloud-phone-number").value);
+  const button = phoneAuthForm.querySelector("button[type=submit]");
+
+  if (!usernameRaw || usernameRaw.length > 24 || !/^[a-z0-9_]{3,24}$/i.test(usernameRaw)) {
+    setMessage(authMessage, "Choisis un pseudo de 3 à 24 caractères : lettres, chiffres ou _.", "error");
+    return;
+  }
+  if (!phone) {
+    setMessage(authMessage, "Saisis ton numéro au format international E.164, par exemple +242XXXXXXXXX ou +33XXXXXXXXX.", "error");
+    return;
+  }
+
+  button.disabled = true;
+  setMessage(authMessage, "Envoi du code SMS sécurisé…", "info");
+  try {
+    const { error } = await supabase.auth.signInWithOtp({
+      phone,
+      options: {
+        shouldCreateUser: true,
+        data: { username, display_name: usernameRaw.slice(0, 60) }
+      }
+    });
+    if (error) throw error;
+
+    pendingPhone = phone;
+    $("pb-cloud-phone-target").textContent = phone;
+    phoneCodePanel.hidden = false;
+    $("pb-cloud-phone-code").focus();
+    setMessage(authMessage, "Code envoyé. Saisis les 6 chiffres reçus par SMS pour créer ton compte ou te connecter.", "success");
+  } catch (error) {
+    const message = error.message || "Impossible d’envoyer le code SMS.";
+    setMessage(authMessage, message + " Vérifie que l’authentification téléphone et un fournisseur SMS sont configurés dans Supabase.", "error");
+  } finally {
+    button.disabled = false;
+  }
+});
+
+phoneVerifyForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const token = $("pb-cloud-phone-code").value.trim();
+  const button = phoneVerifyForm.querySelector("button[type=submit]");
+
+  if (!pendingPhone || !/^\\d{6}$/.test(token)) {
+    setMessage(authMessage, "Le code reçu doit contenir exactement 6 chiffres.", "error");
+    return;
+  }
+
+  button.disabled = true;
+  setMessage(authMessage, "Vérification du numéro…", "info");
+  try {
+    const { data, error } = await supabase.auth.verifyOtp({
+      phone: pendingPhone,
+      token,
+      type: "sms"
+    });
+    if (error) throw error;
+    pendingPhone = "";
+    phoneVerifyForm.reset();
+    phoneCodePanel.hidden = true;
+    await syncSession(data.session);
+    setMessage(authMessage, "Numéro vérifié. Ton compte est prêt, les menus sont déverrouillés.", "success");
+  } catch (error) {
+    setMessage(authMessage, error.message || "Code incorrect ou expiré. Demande un nouveau code.", "error");
+  } finally {
+    button.disabled = false;
+  }
+});
+
+contactForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!currentUser || !profileReady) {
+    setMessage(contactMessage, "Connecte-toi pour gérer tes coordonnées privées.", "error");
+    return;
+  }
+
+  const backupEmail = $("pb-contact-email").value.trim().toLowerCase() || null;
+  const phone = $("pb-contact-phone").value.trim()
+    ? normalizeE164($("pb-contact-phone").value)
+    : null;
+  const country = $("pb-contact-country").value.trim().toUpperCase();
+  const hasContact = Boolean(backupEmail || phone);
+
+  if (backupEmail && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(backupEmail)) {
+    setMessage(contactMessage, "Adresse e-mail secondaire invalide.", "error");
+    return;
+  }
+  if ($("pb-contact-phone").value.trim() && !phone) {
+    setMessage(contactMessage, "Le téléphone doit respecter le format international, par exemple +242XXXXXXXXX.", "error");
+    return;
+  }
+  if (!/^[A-Z]{2}$/.test(country)) {
+    setMessage(contactMessage, "Le pays doit être indiqué avec son code ISO à 2 lettres (CG, FR, CD…).", "error");
+    return;
+  }
+  if (hasContact && !$("pb-contact-consent").checked) {
+    setMessage(contactMessage, "Confirme que tu autorises l’enregistrement privé de ces coordonnées pour la gestion de ton compte.", "error");
+    return;
+  }
+
+  const button = contactForm.querySelector("button[type=submit]");
+  button.disabled = true;
+  setMessage(contactMessage, "Enregistrement privé en cours…", "info");
+
+  try {
+    if (!hasContact) {
+      const { error } = await supabase
+        .from("profile_contacts")
+        .delete()
+        .eq("user_id", currentUser.id);
+      if (error) throw error;
+      currentContacts = null;
+      setMessage(contactMessage, "Les coordonnées secondaires ont été supprimées.", "success");
+    } else {
+      const payload = {
+        backup_email: backupEmail,
+        phone_e164: phone,
+        country_iso2: country
+      };
+      let result;
+      if (currentContacts) {
+        result = await supabase
+          .from("profile_contacts")
+          .update(payload)
+          .eq("user_id", currentUser.id);
+      } else {
+        result = await supabase
+          .from("profile_contacts")
+          .insert({ user_id: currentUser.id, ...payload });
+      }
+      if (result.error) throw result.error;
+      setMessage(contactMessage, "Coordonnées enregistrées dans ton espace privé. Elles ne sont jamais affichées sur ton profil public.", "success");
+    }
+
+    await loadPrivateContacts();
+    $("pb-contact-consent").checked = false;
+  } catch (error) {
+    setMessage(contactMessage, error.message || "Enregistrement impossible. Vérifie ta connexion.", "error");
   } finally {
     button.disabled = false;
   }
