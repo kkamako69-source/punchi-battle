@@ -403,7 +403,7 @@ async function loadCloudData() {
       : "Base connectée · En attente de l’ouverture du premier thème par la modération.";
   } catch (error) {
     console.error("Punchi Battle cloud error:", error);
-    statusNode.textContent = "Connexion à la base indisponible. La démonstration reste consultable plus bas.";
+    statusNode.textContent = "L’arène en ligne est temporairement indisponible. Les données membres restent protégées ; réessaie avec Actualiser.";
     setMessage(authMessage, error.message || "Impossible de charger les données en ligne.", "error");
   } finally {
     loadingEntries = false;
