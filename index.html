@@ -1112,6 +1112,26 @@
         }
     
         /* ==================== LIVE SUPABASE AREA ==================== */
+
+        /* ==================== MEMBER ACCESS AND PRIVATE CONTACTS ==================== */
+        .pb-cloud-auth { grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); }
+        .pb-cloud-privacy-note { color:#a9bdc6; font-size:.78rem; line-height:1.5; margin-top:.55rem; }
+        .pb-nav-lock { margin-left:.35rem; font-size:.78em; opacity:.9; }
+        body.pb-authenticated .pb-nav-lock { display:none; }
+        .nav-btn[aria-disabled="true"] { opacity:.68; border-style:dashed; }
+        .pb-contact-panel { margin:1.2rem 0; border:1px solid rgba(0,255,247,.24); border-radius:18px; padding:clamp(1rem,3vw,1.5rem); background:linear-gradient(145deg,rgba(11,35,48,.96),rgba(18,18,32,.98)); }
+        .pb-contact-panel h3 { color:#00fff7; font-family:'Bebas Neue',sans-serif; font-size:1.6rem; letter-spacing:.04em; margin-bottom:.35rem; }
+        .pb-contact-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.8rem; margin-top:1rem; }
+        .pb-contact-consent { display:flex; gap:.65rem; align-items:flex-start; color:#d4e0e5; font-size:.82rem; line-height:1.5; margin:.8rem 0; }
+        .pb-contact-consent input { margin-top:.2rem; accent-color:#00fff7; }
+        .pb-contact-readout { padding:.8rem; border-radius:10px; background:rgba(255,255,255,.045); color:#c5d5dc; line-height:1.5; overflow-wrap:anywhere; }
+        .pb-contact-readout strong { display:block; color:#fff; font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; margin-bottom:.2rem; }
+        .pb-phone-otp { margin-top:.8rem; padding:.8rem; border:1px solid rgba(0,255,247,.18); border-radius:12px; background:rgba(0,255,247,.045); }
+        .pb-cloud-link { color:#00fff7; text-decoration:underline; text-underline-offset:3px; }
+        @media (max-width:760px) {
+            .pb-contact-grid { grid-template-columns:1fr; }
+        }
+
         [hidden] { display: none !important; }
         .pb-cloud-section {
             width: min(1120px, calc(100% - 2rem));
@@ -1193,7 +1213,7 @@
 
 <body>
     <div class="bg-animation"></div>
-    <div role="note" aria-label="Mode démonstration" style="padding:.65rem 1rem;text-align:center;background:rgba(255,215,0,.09);border-bottom:1px solid rgba(255,215,0,.28);color:#ffe79a;font-size:.82rem;line-height:1.5">ESPACE DE DÉMONSTRATION — les cartes, statistiques et interactions sous cette zone sont des exemples enregistrés localement. Les vrais comptes, thèmes ouverts, punchlines publiées et votes partagés se trouvent dans l’Arène en ligne ci-dessus.</div>
+    <div role="note" aria-label="Mode démonstration" style="padding:.65rem 1rem;text-align:center;background:rgba(255,215,0,.09);border-bottom:1px solid rgba(255,215,0,.28);color:#ffe79a;font-size:.82rem;line-height:1.5">PUNCHI BATTLE — inscris-toi ou connecte-toi avant d’accéder aux menus Battles, Classement et Profil. Les coordonnées de compte restent privées ; les cartes et statistiques sous l’espace en ligne sont des exemples de démonstration.</div>
 
 
     <section class="pb-cloud-section" id="pb-cloud" aria-labelledby="pb-cloud-title">
@@ -1237,17 +1257,46 @@
         </form>
       </div>
 
+      <form class="pb-cloud-card" id="pb-cloud-phone-form" style="margin-top:1rem">
+        <h3>Accès par téléphone · Congo et international</h3>
+        <p class="pb-cloud-privacy-note">Crée ton compte ou connecte-toi par code SMS. Saisis ton numéro au format international : +242…, +243…, +33…, etc. Le code pays n’est pas limité au Congo.</p>
+        <div class="pb-cloud-field">
+          <label for="pb-cloud-phone-username">Nom de guerrier</label>
+          <input id="pb-cloud-phone-username" type="text" autocomplete="nickname" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" required>
+        </div>
+        <div class="pb-cloud-field">
+          <label for="pb-cloud-phone-number">Numéro de téléphone international</label>
+          <input id="pb-cloud-phone-number" type="tel" autocomplete="tel" inputmode="tel" placeholder="+242XXXXXXXXX ou +33XXXXXXXXX" maxlength="16" required>
+        </div>
+        <button class="pb-cloud-button" type="submit">Recevoir mon code SMS</button>
+        <div class="pb-phone-otp" id="pb-cloud-phone-code-panel" hidden>
+          <p class="pb-cloud-privacy-note">Code envoyé au <strong id="pb-cloud-phone-target"></strong>.</p>
+          <form id="pb-cloud-phone-verify">
+            <div class="pb-cloud-field">
+              <label for="pb-cloud-phone-code">Code à 6 chiffres</label>
+              <input id="pb-cloud-phone-code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" minlength="6" maxlength="6">
+            </div>
+            <button class="pb-cloud-button" type="submit">Vérifier et entrer</button>
+          </form>
+        </div>
+        <p class="pb-cloud-privacy-note">L’accès par SMS nécessite l’activation de l’authentification téléphone et d’un fournisseur SMS dans Supabase. Aucun fournisseur payant n’est activé automatiquement.</p>
+      </form>
+
       <div class="pb-cloud-account" id="pb-cloud-account" hidden>
         <div>
           <div class="pb-cloud-user" id="pb-cloud-user"></div>
           <div class="pb-cloud-user-handle" id="pb-cloud-user-handle"></div>
+          <div class="pb-cloud-user-handle" id="pb-cloud-primary-contact"></div>
         </div>
         <button class="pb-cloud-small-button" id="pb-cloud-signout" type="button">Déconnexion</button>
       </div>
 
       <p class="pb-cloud-message" id="pb-cloud-auth-message" role="status" aria-live="polite" hidden></p>
+      <p class="pb-cloud-privacy-note" style="margin-top:.9rem">En créant un compte, tu acceptes le traitement des données nécessaire au fonctionnement de Punchi Battle. Consulte la <a class="pb-cloud-link" href="politique-confidentialite.html">politique de confidentialité</a>.</p>
+
       <p class="pb-cloud-empty" id="pb-cloud-login-note">Les visiteurs peuvent consulter l’arène. Connecte-toi pour voter ou proposer une punchline lorsqu’un thème est ouvert.</p>
 
+      <div id="pb-cloud-member-content" hidden>
       <div class="pb-cloud-columns">
         <section class="pb-cloud-card" aria-labelledby="pb-cloud-theme-heading">
           <h3 class="pb-cloud-section-title" id="pb-cloud-theme-heading">Thèmes ouverts</h3>
@@ -1279,6 +1328,7 @@
           <p class="pb-cloud-message" id="pb-cloud-entry-message" role="status" aria-live="polite" hidden></p>
         </form>
       </section>
+      </div>
     </section>
 
     <!-- HEADER -->
@@ -1293,9 +1343,9 @@
         
         <nav>
             <button class="nav-btn active" data-section="home" onclick="navigateTo('home')">Accueil</button>
-            <button class="nav-btn" data-section="battles" onclick="navigateTo('battles')">Battles</button>
-            <button class="nav-btn" data-section="classement" onclick="navigateTo('classement')">Classement</button>
-            <button class="nav-btn" data-section="profil" onclick="navigateTo('profil')">Profil</button>
+            <button class="nav-btn" data-auth-required="true" aria-disabled="true" title="Inscris-toi ou connecte-toi pour ouvrir ce menu." data-section="battles" onclick="navigateTo('battles')">Battles <span class="pb-nav-lock" aria-hidden="true">🔒</span></button>
+            <button class="nav-btn" data-auth-required="true" aria-disabled="true" title="Inscris-toi ou connecte-toi pour ouvrir ce menu." data-section="classement" onclick="navigateTo('classement')">Classement <span class="pb-nav-lock" aria-hidden="true">🔒</span></button>
+            <button class="nav-btn" data-auth-required="true" aria-disabled="true" title="Inscris-toi ou connecte-toi pour ouvrir ce menu." data-section="profil" onclick="navigateTo('profil')">Mon profil <span class="pb-nav-lock" aria-hidden="true">🔒</span></button>
         </nav>
         
         <button class="back-btn" id="backBtn" onclick="goBack()">
@@ -1503,6 +1553,39 @@
                     <div class="label">Taux de Victoire</div>
                 </div>
             </div>
+
+            <section class="pb-contact-panel" aria-labelledby="pb-contact-heading">
+                <h3 id="pb-contact-heading">Coordonnées privées du compte</h3>
+                <p class="pb-cloud-privacy-note">Ton identifiant principal est géré par Supabase Auth. Les coordonnées secondaires ci-dessous sont enregistrées dans une table privée, accessibles uniquement à ton compte. Elles ne figurent jamais sur ton profil public et ne servent pas à la publicité.</p>
+                <div class="pb-contact-readout" style="margin-top:.8rem">
+                    <strong>Identifiant principal du compte</strong>
+                    <span id="pb-contact-primary">Chargement…</span>
+                    <span class="pb-cloud-privacy-note" id="pb-contact-primary-type"></span>
+                </div>
+                <form id="pb-cloud-contact-form">
+                    <div class="pb-contact-grid">
+                        <div class="pb-cloud-field">
+                            <label for="pb-contact-email">E-mail secondaire (facultatif)</label>
+                            <input id="pb-contact-email" type="email" autocomplete="email" maxlength="254" placeholder="nom@exemple.com">
+                        </div>
+                        <div class="pb-cloud-field">
+                            <label for="pb-contact-phone">Téléphone secondaire (facultatif)</label>
+                            <input id="pb-contact-phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="16" placeholder="+242XXXXXXXXX ou +33XXXXXXXXX">
+                        </div>
+                        <div class="pb-cloud-field">
+                            <label for="pb-contact-country">Pays de résidence (code ISO-2)</label>
+                            <input id="pb-contact-country" type="text" value="CG" maxlength="2" pattern="[A-Za-z]{2}" autocomplete="country" placeholder="CG, CD, FR…">
+                        </div>
+                    </div>
+                    <label class="pb-contact-consent">
+                        <input id="pb-contact-consent" type="checkbox">
+                        <span>J’autorise l’enregistrement privé de ces coordonnées pour la gestion de mon compte, les alertes de sécurité et les communications liées à mes battles. Je comprends que ces coordonnées secondaires ne sont pas vérifiées automatiquement et ne sont pas affichées publiquement.</span>
+                    </label>
+                    <button class="pb-cloud-button" type="submit">Enregistrer mes coordonnées privées</button>
+                    <p class="pb-cloud-message" id="pb-cloud-contact-message" role="status" aria-live="polite" hidden></p>
+                </form>
+                <p class="pb-cloud-privacy-note">Tu peux effacer les coordonnées secondaires en vidant les deux champs puis en enregistrant. Ton adresse e-mail ou ton numéro principal reste géré séparément par le service d’authentification.</p>
+            </section>
 
             <div class="history-list">
                 <h3 style="font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; margin-bottom: 1rem; letter-spacing: 1px;">
@@ -1712,6 +1795,21 @@
 
         // ==================== NAVIGATION ====================
         function navigateTo(section) {
+            const requiresRegistration = section !== 'home';
+            if (requiresRegistration && window.PunchiBattleAuth?.isAuthenticated !== true) {
+                const message = document.getElementById('pb-cloud-auth-message');
+                if (message) {
+                    message.textContent = "Inscris-toi ou connecte-toi d’abord pour accéder aux menus Battles, Classement, Profil et aux autres fonctions.";
+                    message.dataset.kind = "info";
+                    message.hidden = false;
+                }
+                const portal = document.getElementById('pb-cloud');
+                if (portal) portal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const signup = document.getElementById('pb-cloud-signup-username');
+                if (signup) signup.focus({ preventScroll: true });
+                return;
+            }
+
             // Hide all sections
             document.querySelectorAll('.section-view').forEach(el => el.classList.remove('active'));
             
@@ -1835,6 +1933,10 @@
 
         // ==================== DETAIL VIEWS ====================
         function showBattleDetail(id) {
+            if (window.PunchiBattleAuth?.isAuthenticated !== true) {
+                navigateTo('battle-detail');
+                return;
+            }
             const battle = punchlines.find(p => p.id === id);
             if (!battle) return;
             
@@ -1905,6 +2007,10 @@
         }
 
         function showPlayerDetail(index) {
+            if (window.PunchiBattleAuth?.isAuthenticated !== true) {
+                navigateTo('player-detail');
+                return;
+            }
             const player = leaderboard[index];
             if (!player) return;
             
