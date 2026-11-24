@@ -28,19 +28,27 @@ Documentation :
 
 ## 3. Téléphone international et SMS OTP
 
-Le site accepte les numéros au format E.164, avec indicatifs internationaux : +242 (République du Congo), +243 (RDC), +33 (France), etc. Le pays par défaut des coordonnées secondaires est CG, mais il ne restreint pas les numéros autorisés.
+Le site accepte les numéros au format E.164. Le Congo (+242) est proposé en premier, mais le membre peut sélectionner un indicatif courant ou saisir un autre numéro complet commençant par `+`. Le champ de coordonnées secondaires reste libre et accepte tout indicatif E.164 valide.
 
 Dans **Authentication → Providers → Phone** :
 
 1. Activer Phone.
-2. Choisir un fournisseur SMS pris en charge (Twilio, Vonage, MessageBird ou TextLocal).
-3. Ajouter les identifiants du fournisseur et son gabarit SMS avec la variable OTP correcte.
-4. Configurer un délai d’envoi, les limites de fréquence et CAPTCHA.
-5. Tester d’abord avec les numéros/codes de test prévus par Supabase ; n’utiliser un fournisseur en production qu’après vérification des prix et de la livraison dans les pays ciblés.
+2. Choisir un fournisseur SMS pris en charge par Supabase.
+3. Ajouter ses identifiants et son modèle OTP.
+4. Configurer une limite d’envoi, CAPTCHA et les alertes de dépenses.
+5. Tester la livraison sur plusieurs réseaux congolais (notamment MTN et Airtel) et sur au moins un numéro étranger, avant d’ouvrir l’inscription au public.
 
-La documentation Supabase consultée le 24 novembre 2026 indique par défaut un nouvel OTP possible toutes les 60 secondes et un code valable une heure (la configuration du fournisseur peut modifier certains paramètres). Les numéros peuvent être recyclés par les opérateurs ; privilégier également une adresse e-mail confirmée et prévoir MFA/récupération avant d’utiliser uniquement un téléphone comme identité. Les messages SMS peuvent entraîner des frais à chaque envoi. Vérifier les tarifs par pays, notamment pour les numéros congolais et ceux de la diaspora.
+La documentation Supabase du 16 novembre 2026 indique que l’authentification téléphone utilise des codes OTP transmis par SMS ou, pour certains fournisseurs, WhatsApp. Les fournisseurs SMS pris en charge cités sont MessageBird, Twilio, Vonage et TextLocal (communautaire). Par défaut, une nouvelle demande d’OTP est limitée à une par 60 secondes ; le code standard expire après une heure. Configure quand même CAPTCHA et des limites plus strictes pour réduire les abus et les coûts. La connexion par téléphone exige que l’utilisateur vérifie son numéro à chaque connexion. <https://supabase.com/docs/guides/auth/phone-login>
 
-**Risque des numéros recyclés :** les opérateurs peuvent réattribuer un ancien numéro. Un numéro vérifié n’est pas un identifiant permanent. Encourage les membres à garder une adresse e-mail qu’ils contrôlent. Ne présente pas les coordonnées secondaires actuellement facultatives comme une récupération de compte : elles ne sont pas encore vérifiées indépendamment. Pour renforcer les comptes exclusivement téléphoniques, prévoir un second facteur ou une méthode de récupération fiable.
+### Ce que j’ai vérifié pour le +242 (République du Congo)
+
+- **Twilio :** sa page officielle affiche actuellement **0,3371 USD par segment SMS sortant** vers le Congo, hors éventuels frais de transport opérateur et hors variation tarifaire. Les messages sont facturés par segment, donc les SMS longs peuvent coûter plus cher. La même page indique que le SMS bidirectionnel n’est pas pris en charge. Les identifiants expéditeur alphanumériques sont soumis à des règles de pré-enregistrement ; les identifiants numériques dynamiques peuvent être remplacés ou filtrés notamment sur Airtel et MTN. Twilio recommande un Sender ID alphanumérique pré-enregistré ; sa page mentionne un délai de provisionnement pouvant atteindre environ trois semaines. <https://www.twilio.com/en-us/guidelines/cg/sms> · <https://www.twilio.com/en-us/sms/pricing/cg>
+- **Vonage :** sa fiche Congo indique un Sender ID alphanumérique portant la marque, un pré-enregistrement obligatoire pour le réseau MTN, l’absence de Sender ID numérique standard et l’interdiction des expéditeurs génériques tels que INFO/SMS/NOTICE. Elle précise également que le trafic P2P est interdit. Vérifier par écrit que le cas d’usage OTP transactionnel et le routage MTN/Airtel sont acceptés avant toute activation. <https://api.support.vonage.com/hc/en-us/articles/7538554948628-Republic-of-the-Congo-SMS-Features-and-Restrictions>
+- **MessageBird :** la documentation Supabase signale une intégration basée sur les anciennes API MessageBird ; un nouveau compte Bird peut ne pas être compatible avec ce connecteur. Ne pas choisir ce fournisseur sans test de bout en bout. <https://supabase.com/docs/guides/auth/phone-login>
+
+Ces tarifs et règles sont des informations observées le 24 novembre 2026 et peuvent évoluer sans préavis. Le montant du fournisseur, les frais opérateur, taxes, re-tentatives et la disponibilité réelle sur chaque réseau doivent être confirmés avant achat. **Aucun fournisseur SMS ni abonnement payant n’a été activé dans ton projet.**
+
+**Risque des numéros recyclés et SIM swap :** les opérateurs peuvent réattribuer un ancien numéro et les comptes téléphoniques sont exposés au SIM swap. Une adresse e-mail confirmée et contrôlée est recommandée comme moyen de contact alternatif. Avant de faire du téléphone le seul identifiant d’un compte, prévoir une MFA robuste et une procédure de récupération adaptée. Ne présente pas les coordonnées secondaires actuellement facultatives comme une récupération de compte : elles ne sont pas vérifiées indépendamment. <https://supabase.com/docs/guides/auth/passwords> · <https://supabase.com/docs/guides/auth/auth-mfa/phone>
 
 Références :
 - https://supabase.com/docs/guides/auth/phone-login
