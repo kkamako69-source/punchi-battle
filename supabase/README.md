@@ -2,59 +2,86 @@
 
 ## État réel au 24 novembre 2026
 
-Le projet Supabase `punchi-battle` a été créé dans `Specimens Org`, région `eu-west-3` (Paris). Le devis de création était de **0 USD/mois**. Cela ne couvre pas d’éventuels dépassements, services externes ni options futures : surveiller les quotas et la facturation.
+Le projet Supabase `punchi-battle` se trouve dans `Specimens Org`, région `eu-west-3` (Paris). Le devis initial de création était de **0 USD/mois** ; les SMS, SMTP tiers, dépassements, services et plans additionnels peuvent coûter de l’argent.
 
 - Projet : `ppuhpuuuxohokuzfctpq`
 - API : https://ppuhpuuuxohokuzfctpq.supabase.co
 - État observé : `ACTIVE_HEALTHY`
-- PostgreSQL : version 17.12
-- Migrations appliquées : schéma initial, index supplémentaires, privilèges/anti-spam, compteur privé des votes, verrouillage anti-concurrence et visibilité des thèmes selon leur fenêtre d’ouverture.
-- 6 tables publiques avec RLS ; 16 policies ; 6 thèmes initiaux, tous inactifs.
-- Aucun profil ni contenu utilisateur réel n’a été créé dans la base lors de cette revue.
+- PostgreSQL : 17.12
+- **10 migrations appliquées**
+- **8 tables**, RLS sur chacune, **22 policies**
+- 6 thèmes de départ, tous inactifs
+- Aucun compte, aucune participation, aucun vote, aucun commentaire et aucune coordonnée secondaire réelle n’ont encore été enregistrés.
 
-## Architecture et sécurité
+## Parcours membre et consentement
 
-- Supabase Auth gère les identités ; aucun mot de passe n’est stocké dans une table publique.
-- Le navigateur utilise uniquement la clé publishable (`sb_publishable_...`) dans `supabase.js`. Cette clé est publique par conception ; RLS et les privilèges SQL constituent la barrière d’accès. Aucun secret/service-role n’est dans le dépôt.
-- Le profil est créé après connexion/confirmation par l’utilisateur lui-même via `profiles_insert_self` ; l’identifiant du profil doit être `auth.uid()`.
-- Les participations et commentaires sont créés avec le statut `pending`. Le navigateur ne dispose pas du privilège SQL pour les publier, masquer ou modifier leur statut.
-- Un seul vote est permis par compte et par punchline grâce à une contrainte unique.
-- Les lignes de votes ne sont lisibles que par leur votant. Le total public est une colonne agrégée `entries.vote_count`, mise à jour par un déclencheur privé. Aucune vue publique privilégiée ne contourne RLS.
-- Un helper `SECURITY DEFINER` est utilisé uniquement dans le schéma non exposé `private`, avec `search_path` vide, vérification de `auth.uid()` et droits d’exécution révoqués pour `PUBLIC`, `anon` et `authenticated`.
-- Limites de publication côté base : 5 punchlines par compte sur 24 heures et 20 commentaires par heure. Un verrou transactionnel par compte et type de contenu sérialise les contrôles de limite pour résister aux envois simultanés. Les dates de création sont définies par PostgreSQL.
+- Supabase Auth conserve l’identifiant principal : e-mail ou numéro téléphone vérifié selon le mode choisi. Aucun mot de passe n’est stocké dans les tables publiques.
+- L’inscription e-mail demande une confirmation. La connexion par téléphone utilise un OTP SMS et un numéro E.164 ; le fournisseur SMS reste à configurer.
+- La politique `PB-PRIVACY-2026-11-V1` doit être acceptée. L’acceptation est inscrite dans `account_consents` et enregistrée pour le compte connecté.
+- Les policies RLS vérifient l’existence du consentement courant avant de lire ou d’écrire les données membre. Les visiteurs anonymes n’ont aucun privilège de table sur les huit tables.
+- Les anciens comptes qui se connectent après un changement de politique voient un formulaire de renouvellement du consentement.
 
-Après la dernière migration, les conseillers Supabase ne signalent aucune alerte de sécurité ni de santé. Les seules alertes performance restantes sont des index non encore utilisés sur une base vide ; elles sont informatives, pas des échecs.
+## Coordonnées et confidentialité
 
-## État de l’application
+- `profiles` ne contient que les champs de profil public (pseudo, nom d’affichage, biographie, avatar). Il ne contient ni e-mail ni téléphone.
+- `profile_contacts` conserve facultativement un e-mail secondaire, un téléphone E.164 et un code pays ISO-2. Les règles SQL permettent au seul propriétaire de lire/modifier ses coordonnées et de les supprimer ; aucune lecture anonyme n’est accordée.
+- Les coordonnées secondaires ne sont **pas vérifiées** par le formulaire et ne doivent pas être utilisées comme récupération du compte avant la mise en place d’une vérification indépendante.
+- `account_consents` est un registre append-only : les utilisateurs peuvent lire et ajouter leurs propres consentements, pas les modifier ni les supprimer.
+- Les e-mails et téléphones ne figurent pas dans les profils publics, les cartes de battle, les classements ou les réponses du flux public.
 
-La page `index.html` dispose maintenant d’un espace en ligne : inscription/connexion, profil, lecture des thèmes actifs, envoi de punchlines en attente de modération, flux de contenus publiés et votes partagés. La maquette locale plus bas est conservée comme exemple et reste explicitement séparée.
+## Sécurité métier
 
-**L’ouverture publique n’est pas encore complète.** Avant d’utiliser les inscriptions avec le grand public, configure les URLs d’authentification et un SMTP personnalisé selon [CONFIGURATION.md](CONFIGURATION.md). Le fournisseur d’e-mail intégré de Supabase est limité aux adresses autorisées de l’équipe et à 2 e-mails par heure ; il ne convient pas à un lancement public.
+- Participations et commentaires démarrent avec `status = 'pending'`. Le navigateur ne peut pas changer les statuts de modération.
+- Une contrainte garantit un seul vote par membre et par participation.
+- Le compteur public des votes est stocké dans `entries.vote_count` et mis à jour par un trigger dans le schéma non exposé `private`. Aucune vue publique privilégiée n’est utilisée.
+- Un helper `SECURITY DEFINER` existe uniquement dans `private`, avec `search_path` vide, vérification de `auth.uid()` et exécution révoquée aux rôles publics.
+- Limites serveur : 5 punchlines par compte sur 24 heures, 20 commentaires par heure. Les vérifications sont sérialisées avec un verrou transactionnel.
+- Les dates de création sont produites par PostgreSQL.
+- Les thèmes ne sont lisibles que lorsque `is_active`, `opens_at` et `closes_at` autorisent l’accès.
 
-Les six thèmes restent inactifs. Cela empêche les soumissions avant que la modération et l’organisation soient prêtes. Le site affiche donc « aucun thème ouvert » jusqu’à l’activation volontaire d’un thème dans le tableau de bord.
+Les vérifications SQL confirment actuellement que `anon` ne peut effectuer aucune opération SELECT/INSERT/UPDATE/DELETE sur les huit tables. Les conseillers Supabase ne remontent aucune alerte de sécurité ou de santé. Les alertes performance restantes concernent des index non encore utilisés sur une base vide.
+
+## État de l’interface
+
+Les menus Battles, Classement et Mon profil sont verrouillés avant connexion et acceptation de la politique. La démonstration locale est conservée séparément et clairement identifiée.
+
+**Le lancement public n’est pas encore prêt :**
+- SMTP personnalisé requis pour les e-mails destinés au public.
+- Fournisseur SMS requis pour l’OTP téléphone.
+- CAPTCHA et limites OTP à configurer pour maîtriser les coûts SMS.
+- L’identité et le contact du responsable du traitement restent à compléter dans la notice.
+- La notice doit faire l’objet d’une vérification juridique avant un lancement en République du Congo et à l’international.
+- Une interface de modération protégée reste à construire.
 
 ## Audit réutilisable
 
-Un notebook SQL en lecture seule est disponible dans le projet Supabase : [Punchi Battle — audit continu](https://supabase.com/dashboard/project/ppuhpuuuxohokuzfctpq/explorer/notebook/409399d0-c7c0-4b40-a58c-7fa04c74025d). Il regroupe les contrôles RLS, les politiques, les volumes, les thèmes, les privilèges d’insertion et la cohérence des compteurs de votes.
+Le notebook SQL [Punchi Battle — audit continu](https://supabase.com/dashboard/project/ppuhpuuuxohokuzfctpq/explorer/notebook/409399d0-c7c0-4b40-a58c-7fa04c74025d) suit les volumes, RLS, policies, privilèges et compteurs. Un audit complémentaire « Membres & confidentialité » peut être utilisé pour contrôler les contacts, le registre de consentement et l’absence de droits anonymes.
 
-## Tests à effectuer avant lancement
+## Tests à réaliser avant ouverture
 
 1. Configurer URL du site, URL de redirection et SMTP.
-2. Tester une inscription avec confirmation e-mail puis une reconnexion.
-3. Tester l’isolation de deux comptes distincts et la lecture anonyme.
-4. Tester la soumission pending, la modération et l’impossibilité de modifier le statut depuis le navigateur.
-5. Tester deux votes sur la même punchline, le retrait d’un vote et le compteur agrégé.
-6. Vérifier les limites anti-spam, les sauvegardes et les quotas Free.
+2. Configurer le fournisseur SMS, ses gabarits, CAPTCHA et limites de fréquence ; vérifier les tarifs et pays desservis.
+3. Tester inscription et confirmation e-mail.
+4. Tester OTP SMS avec un numéro congolais et un numéro étranger.
+5. Tester un compte qui n’a pas accepté la notice : il doit voir uniquement le portail/écran de consentement ; l’API doit refuser les données membre.
+6. Tester l’acceptation de la notice et le déverrouillage des menus.
+7. Tester deux comptes distincts, contacts privés, participation pending, vote, retrait du vote et signalement.
+8. Tester effacement des coordonnées secondaires et procédure de suppression du compte.
+9. Préparer sauvegardes, exports, rétention, gestion des incidents et modération.
 
-## Fichiers
+## Fichiers et migrations
 
-- `migrations/202611210001_punchi_battle_schema.sql` — tables, RLS et privilèges initiaux.
-- `migrations/20261124095000_add_fk_owner_indexes.sql` — index supplémentaires.
+- `migrations/202611210001_punchi_battle_schema.sql` — schéma initial et RLS.
+- `migrations/20261124095000_add_fk_owner_indexes.sql` — index de clés étrangères.
 - `migrations/20261124121800_harden_write_paths_and_vote_totals.sql` — droits d’insertion limités et limites anti-spam.
 - `migrations/20261124122000_replace_vote_view_with_private_counter.sql` — compteur de votes privé.
-- `migrations/20261124123000_serialize_rate_limits.sql` — verrou transactionnel des limites anti-spam.
-- `migrations/20261124123500_filter_themes_by_open_window.sql` — lecture publique limitée aux thèmes réellement ouverts.
-- `seed.sql` — thèmes de démarrage désactivés.
+- `migrations/20261124123000_serialize_rate_limits.sql` — verrou transactionnel des limites.
+- `migrations/20261124123500_filter_themes_by_open_window.sql` — visibilité des thèmes selon leurs fenêtres.
+- `migrations/20261124122000_private_contact_details.sql` — coordonnées secondaires privées.
+- `migrations/20261124130000_record_privacy_consent.sql` — registre append-only des consentements.
+- `migrations/20261124131000_require_current_member_consent.sql` — consentement obligatoire dans les policies.
+- `migrations/20261124131500_revoke_inherited_anon_privileges.sql` — suppression des privilèges anonymes hérités.
+- `seed.sql` — six thèmes inactifs.
 - `../supabase.js` — client navigateur épinglé à `@supabase/supabase-js@2.119.2`.
-- `CONFIGURATION.md` — réglages de lancement dans Supabase.
-- `../RESEARCH_AND_ROADMAP.md` — sources et évolutions envisagées.
+- `CONFIGURATION.md` — réglages Auth/SMTP/SMS.
+- `../politique-confidentialite.html` — notice provisoire à compléter.
