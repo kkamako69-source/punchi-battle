@@ -46,6 +46,13 @@ Sources : https://huggingface.co/datasets/BantuLanguagesInitiative/LRSC · https
 - Séparer les données fictives de démo des données réelles.
 - Ajouter des jeux de test synthétiques, clairement identifiés, plutôt que d'utiliser les données personnelles de vraies personnes.
 
+## État du backend au 24 novembre 2026
+
+Le projet Supabase `punchi-battle` a été créé dans `Specimens Org`, région `eu-west-3` (Paris), avec un devis initial de création à **0 USD/mois**. L’état observé est `ACTIVE_HEALTHY`. Les deux migrations sont appliquées ; six tables existent et RLS est activée sur chacune. Le seed contient six thèmes, tous inactifs. Aucun profil, vote, commentaire ou texte utilisateur n’est encore présent.
+
+Les conseillers Supabase ne signalent pas d’alerte de sécurité ni de santé. Les alertes de performance restantes sont uniquement des index non encore utilisés dans une base vide ; deux index couvrant les clés propriétaires des votes et commentaires ont été ajoutés pour éviter des scans lors des consultations par utilisateur.
+
+**Important :** la page GitHub Pages reste une démonstration locale. Le fait que la base existe n’active pas encore l’inscription, les votes ou les publications partagés. L’intégration front-end doit être faite et testée avec deux comptes et un visiteur anonyme avant ouverture publique.
 ## Prochaines étapes
 
 1. Connecter un environnement de prévisualisation avec la seule clé publishable ; garder tout secret côté serveur.
