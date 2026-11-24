@@ -18,6 +18,7 @@ MEMBER_CONSENT_MIGRATION = ROOT / "supabase/migrations/20261124131000_require_cu
 ANON_PRIVILEGES_MIGRATION = ROOT / "supabase/migrations/20261124131500_revoke_inherited_anon_privileges.sql"
 LEADERBOARD_MIGRATION = ROOT / "supabase/migrations/20261124132000_member_leaderboard_view.sql"
 LEADERBOARD_RANK_MIGRATION = ROOT / "supabase/migrations/20261124132500_add_member_leaderboard_rank.sql"
+TYPES = ROOT / "supabase/database.types.ts"
 SEED = ROOT / "supabase/seed.sql"
 
 TABLES = ("profiles", "themes", "entries", "votes", "comments", "reports")
@@ -67,6 +68,7 @@ def main() -> int:
     anon_privileges = read_required(ANON_PRIVILEGES_MIGRATION, "migration de révocation des privilèges anonymes", errors)
     leaderboard = read_required(LEADERBOARD_MIGRATION, "migration du classement membre", errors)
     leaderboard_rank = read_required(LEADERBOARD_RANK_MIGRATION, "migration du rang membre", errors)
+    generated_types = read_required(TYPES, "types TypeScript générés", errors)
     seed = read_required(SEED, "catalogue seed SQL", errors)
 
     for table in TABLES:
@@ -203,6 +205,14 @@ def main() -> int:
         "revoke all on public.member_leaderboard from public, anon, authenticated",
         "grant select on public.member_leaderboard to authenticated",
     ), "classement calculé avec RLS", errors)
+
+    require_fragments(generated_types, (
+        "export type database =",
+        "profile_contacts:",
+        "account_consents:",
+        "member_leaderboard:",
+        "rank_number:",
+    ), "types TypeScript synchronisés", errors)
 
     require_fragments(leaderboard_rank, (
         "create or replace view public.member_leaderboard",
