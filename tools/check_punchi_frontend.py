@@ -107,13 +107,14 @@ def main() -> int:
         errors.append("classement non relié à la vue PostgreSQL membre")
     if "data-pb-view-panel" not in html or "function showMemberView" not in client:
         errors.append("navigation réelle entre les écrans membre manquante")
-    if "body > header, body > main, body > footer { display:none !important; }" not in html.replace(" ", ""):
-        # Keep the legacy static showcase out of the signed-in production shell.
-        compact = re.sub(r"\s+", "", html)
-        if "body>header,body>main,body>footer{display:none!important;}" not in compact:
-            errors.append("ancienne interface fictive visible dans le shell membre")
-    if "email || currentUser.phone" in client and "pb-contact-primary" in client:
-        pass
+    # Keep the previous mock dashboard hidden from the new account-first product shell.
+    compact = re.sub(r"\s+", "", html)
+    if "body>header,body>main,body>footer{display:none!important;}" not in compact:
+        errors.append("ancienne interface fictive visible dans le shell membre")
+    if ".from(\"member_leaderboard\")" not in client or "rank_number" not in client:
+        errors.append("classement et rang individuel non reliés à PostgreSQL")
+    if "recordPrivacyConsent(user)" not in client or "account_consents" not in client:
+        errors.append("enregistrement du consentement versionné manquant")
 
     form_checker = FormNestingChecker()
     form_checker.feed(html)
