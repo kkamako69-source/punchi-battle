@@ -1,35 +1,57 @@
 # Punchi Battle — L’Arène des Mots
 
-Punchi Battle est une plateforme de battles de punchlines : un thème est ouvert, les MC proposent leurs textes, une modération valide les participations, puis la communauté vote.
+Punchi Battle est une plateforme de battles de punchlines : un thème est ouvert, les MC proposent leurs textes, une modération valide les participations, puis les membres votent.
 
-## État du projet au 24 novembre 2026
+## État au 24 novembre 2026
 
-- Le site GitHub Pages comprend une nouvelle zone **Arène en ligne** reliée au backend Supabase.
-- Les comptes utilisent Supabase Auth ; les profils, thèmes, punchlines et votes sont stockés dans PostgreSQL.
-- Les punchlines nouvellement envoyées restent en attente de modération. Seules les participations publiées apparaissent dans le flux public.
-- Le compteur de votes est visible publiquement, mais l'identité des votants reste privée.
-- L'ancienne maquette locale reste en dessous de l'espace en ligne pour comparaison ; ses statistiques et interactions sont fictives et indépendantes de la vraie base.
-- Les six thèmes sont volontairement fermés jusqu'à ce qu'un responsable soit prêt à ouvrir une battle.
+- Le site possède un portail d’inscription/connexion par e-mail ou téléphone.
+- Les menus **Battles**, **Classement** et **Mon profil** restent verrouillés tant que le compte n’est pas authentifié et que la version courante de la politique de confidentialité n’a pas été acceptée.
+- La base PostgreSQL utilise huit tables, RLS sur chacune et 22 politiques.
+- Les coordonnées principales restent dans Supabase Auth. Les coordonnées secondaires sont dans une table privée distincte.
+- Les visiteurs anonymes n’ont aucun privilège SQL de lecture ou d’écriture sur les huit tables.
+- Les six thèmes sont volontairement fermés jusqu’à ce que la modération soit prête.
+- L’ancienne maquette locale reste disponible comme démonstration, séparée de la vraie base. Ses chiffres ne sont pas des statistiques réelles.
 
-**Avant d'ouvrir au public :** configure l'URL et la redirection Auth, un SMTP personnalisé et la modération. Le SMTP de test Supabase intégré n'est pas adapté à des inscriptions publiques. Voir [Configuration Supabase](supabase/CONFIGURATION.md).
+## Parcours de compte
 
-## Structure
+**E-mail :** adresse + mot de passe (12 caractères minimum) + confirmation de l’adresse par e-mail.
 
-- `index.html` : site principal, espace en ligne et ancienne maquette de présentation.
-- `supabase.js` : client navigateur Supabase épinglé à `@supabase/supabase-js@2.119.2`, avec une clé publishable uniquement.
-- `supabase/migrations/` : quatre migrations SQL versionnées et appliquées au projet connecté.
-- `supabase/seed.sql` : six thèmes initiaux, tous inactifs.
-- `supabase/README.md` : architecture réelle, privilèges, contrôles et statut.
-- `supabase/CONFIGURATION.md` : URL Auth, SMTP, modération et étapes avant lancement.
-- `RESEARCH_AND_ROADMAP.md` : ressources, licences, stratégie et étapes futures.
+**Téléphone :** OTP SMS à six chiffres au format international E.164. Le Congo est prérempli comme pays de référence pour les coordonnées secondaires ; les indicatifs internationaux sont acceptés, sans restriction géographique.
 
-## Sécurité de la base
+**Coordonnées secondaires :** e-mail et/ou téléphone facultatifs, conservés dans `profile_contacts`, visibles uniquement par le membre propriétaire. Ces coordonnées secondaires ne sont pas vérifiées par le formulaire et ne constituent pas un moyen de récupération du compte.
 
-Les six tables publiques ont RLS activée. Les privilèges SQL sont limités par colonne pour les INSERT ; les statuts de modération et les horodatages sont gérés côté base. Les votes sont uniques par compte et par participation. Une fonction privée met à jour uniquement le total public sans exposer les identités des votants. Des limites serveur réduisent le spam : 5 punchlines par compte sur 24 heures, 20 commentaires par heure.
+**Consentement :** chaque compte doit accepter la version courante de la politique ; l’acceptation est enregistrée dans `account_consents` et les policies RLS la vérifient. Les coordonnées ne sont jamais rendues publiques.
 
-Ne place jamais de clé `sb_secret_...`, `service_role`, mot de passe PostgreSQL ou secret SMTP dans GitHub ou dans le navigateur.
+## À terminer avant l’ouverture publique
 
-## Contrôles
+1. Configurer l’URL de redirection et un SMTP personnalisé pour les e-mails.
+2. Activer l’authentification téléphonique et choisir un fournisseur SMS (Twilio, Vonage, MessageBird ou autre pris en charge). Aucun fournisseur ni abonnement SMS payant n’a été activé.
+3. Configurer CAPTCHA et les limites de l’OTP pour éviter les abus et les frais SMS.
+4. Compléter l’identité légale et les coordonnées du responsable dans la notice, puis faire vérifier les obligations de traitement et de transfert international applicables en République du Congo.
+5. Créer une interface de modération protégée avant d’ouvrir les thèmes et les publications au public.
+
+Voir [Configuration Supabase](supabase/CONFIGURATION.md) et [Politique de confidentialité](politique-confidentialite.html).
+
+## Architecture
+
+- `index.html` : interface principale, espace de compte, menus membres et démonstration locale.
+- `supabase.js` : client navigateur épinglé à `@supabase/supabase-js@2.119.2`, avec clé publishable uniquement.
+- `supabase/migrations/` : dix migrations SQL versionnées et appliquées au projet Supabase.
+- `supabase/seed.sql` : six thèmes de départ désactivés.
+- `supabase/README.md` : architecture réelle, sécurité, privilèges et état.
+- `supabase/CONFIGURATION.md` : URL Auth, e-mail, SMS, CAPTCHA, modération et lancement.
+- `politique-confidentialite.html` : notice provisoire à compléter et valider.
+- `RESEARCH_AND_ROADMAP.md` : recherches, licences et étapes suivantes.
+
+## Sécurité
+
+Les huit tables sont protégées par RLS. Le consentement versionné est vérifié au niveau PostgreSQL : masquer les menus dans le navigateur n’est pas la seule barrière. Les rôles `PUBLIC` et `anon` n’ont aucun droit de table sur les données membres. Les coordonnées privées utilisent des droits limités et des policies propriétaire-seul.
+
+Les votes sont uniques par compte et par participation. Un compteur agrégé est maintenu par une fonction privée. Les statuts de modération et les horodatages ne peuvent pas être choisis librement depuis le navigateur. Des limites anti-spam transactionnelles s’appliquent aux punchlines et aux commentaires.
+
+Ne place jamais une clé `sb_secret_...`, `service_role`, un mot de passe PostgreSQL ou un secret SMTP/SMS dans GitHub ou dans le navigateur.
+
+## Contrôles locaux
 
 ```sh
 python tools/check_site.py
@@ -39,11 +61,12 @@ python tools/check_supabase_schema.py
 python tools/check_punchi_frontend.py
 ```
 
-GitHub Actions exécute les contrôles HTML, JavaScript classique, le module navigateur et les contrôles de schéma. CodeQL analyse le JavaScript et Dependabot suit chaque semaine les GitHub Actions.
+GitHub Actions lance les contrôles HTML, JavaScript, module Supabase, schéma et contrat front-end. CodeQL analyse le JavaScript et Dependabot suit les actions GitHub.
 
 ## Liens
 
-- [Projet GitHub](https://github.com/kkamako69-source/punchi-battle)
-- [Site publié](https://kkamako69-source.github.io/punchi-battle/)
-- [Backend Supabase](https://supabase.com/dashboard/project/ppuhpuuuxohokuzfctpq)
-- [Politique de sécurité](SECURITY.md)
+- [Dépôt GitHub](https://github.com/kkamako69-source/punchi-battle)
+- [Site](https://kkamako69-source.github.io/punchi-battle/)
+- [Supabase](https://supabase.com/dashboard/project/ppuhpuuuxohokuzfctpq)
+- [Audit continu Supabase](https://supabase.com/dashboard/project/ppuhpuuuxohokuzfctpq/explorer/notebook/409399d0-c7c0-4b40-a58c-7fa04c74025d)
+- [Politique de confidentialité](politique-confidentialite.html)
