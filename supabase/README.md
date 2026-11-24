@@ -8,7 +8,7 @@ Le projet Supabase `punchi-battle` a été créé dans `Specimens Org`, région 
 - API : https://ppuhpuuuxohokuzfctpq.supabase.co
 - État observé : `ACTIVE_HEALTHY`
 - PostgreSQL : version 17.12
-- Migrations appliquées : schéma initial, index supplémentaires, privilèges/anti-spam, compteur privé des votes et verrouillage anti-concurrence.
+- Migrations appliquées : schéma initial, index supplémentaires, privilèges/anti-spam, compteur privé des votes, verrouillage anti-concurrence et visibilité des thèmes selon leur fenêtre d’ouverture.
 - 6 tables publiques avec RLS ; 16 policies ; 6 thèmes initiaux, tous inactifs.
 - Aucun profil ni contenu utilisateur réel n’a été créé dans la base lors de cette revue.
 
@@ -53,6 +53,7 @@ Un notebook SQL en lecture seule est disponible dans le projet Supabase : [Punch
 - `migrations/20261124121800_harden_write_paths_and_vote_totals.sql` — droits d’insertion limités et limites anti-spam.
 - `migrations/20261124122000_replace_vote_view_with_private_counter.sql` — compteur de votes privé.
 - `migrations/20261124123000_serialize_rate_limits.sql` — verrou transactionnel des limites anti-spam.
+- `migrations/20261124123500_filter_themes_by_open_window.sql` — lecture publique limitée aux thèmes réellement ouverts.
 - `seed.sql` — thèmes de démarrage désactivés.
 - `../supabase.js` — client navigateur épinglé à `@supabase/supabase-js@2.119.2`.
 - `CONFIGURATION.md` — réglages de lancement dans Supabase.
