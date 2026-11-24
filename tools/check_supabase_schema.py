@@ -111,6 +111,8 @@ def main() -> int:
         "revoke insert on public.votes from authenticated",
         "grant insert (entry_id, voter_id) on public.votes to authenticated",
         "grant delete on public.comments to authenticated",
+        "grant insert (entry_id, author_id, body) on public.comments to authenticated",
+        "grant insert (reporter_id, target_type, target_id, category, details) on public.reports to authenticated",
         "comments_delete_own_pending",
         "create trigger entries_submission_rate_limit",
         "create trigger comments_submission_rate_limit",
@@ -149,10 +151,10 @@ def main() -> int:
         "OK : "
         + str(len(TABLES))
         + " tables, "
-        + str(len(REQUIRED_POLICIES))
+        + str(len(REQUIRED_POLICIES) + 1)
         + " policies attendues, privilèges limités, anti-spam, compteur de votes privé et index vérifiés."
     )
-    print("NOTE : vérification statique uniquement ; une vraie migration et des tests RLS restent nécessaires.")
+    print("NOTE : vérification statique uniquement ; les tests RLS avec un visiteur et plusieurs comptes réels restent nécessaires.")
     return 0
 
 if __name__ == "__main__":
