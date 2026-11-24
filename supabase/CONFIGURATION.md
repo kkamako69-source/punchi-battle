@@ -1,6 +1,6 @@
 # Configuration Supabase — Punchi Battle
 
-Le code, la base et les contrôles de sécurité sont en place. Les services d’envoi d’e-mail et de SMS doivent toutefois être configurés par le propriétaire du compte ; aucun fournisseur tiers ni frais SMS n’ont été activés automatiquement.
+Le shell membre, la base, les menus Arène/Classement/Profil et les contrôles de sécurité sont en place. Les services d’envoi d’e-mail et de SMS doivent toutefois être configurés par le propriétaire du compte ; aucun fournisseur tiers ni frais SMS n’ont été activés automatiquement.
 
 ## 1. URL du site et redirection e-mail
 
@@ -38,7 +38,7 @@ Dans **Authentication → Providers → Phone** :
 4. Configurer un délai d’envoi, les limites de fréquence et CAPTCHA.
 5. Tester d’abord avec les numéros/codes de test prévus par Supabase ; n’utiliser un fournisseur en production qu’après vérification des prix et de la livraison dans les pays ciblés.
 
-La documentation Supabase consultée le 24 novembre 2026 indique par défaut un nouvel OTP possible toutes les 60 secondes et un code valable une heure (la configuration du fournisseur peut modifier certains paramètres). Les messages SMS peuvent entraîner des frais à chaque envoi. Vérifier les tarifs par pays, notamment pour les numéros congolais et ceux de la diaspora.
+La documentation Supabase consultée le 24 novembre 2026 indique par défaut un nouvel OTP possible toutes les 60 secondes et un code valable une heure (la configuration du fournisseur peut modifier certains paramètres). Les numéros peuvent être recyclés par les opérateurs ; privilégier également une adresse e-mail confirmée et prévoir MFA/récupération avant d’utiliser uniquement un téléphone comme identité. Les messages SMS peuvent entraîner des frais à chaque envoi. Vérifier les tarifs par pays, notamment pour les numéros congolais et ceux de la diaspora.
 
 **Risque des numéros recyclés :** les opérateurs peuvent réattribuer un ancien numéro. Un numéro vérifié n’est pas un identifiant permanent. Encourage les membres à garder une adresse e-mail qu’ils contrôlent. Ne présente pas les coordonnées secondaires actuellement facultatives comme une récupération de compte : elles ne sont pas encore vérifiées indépendamment. Pour renforcer les comptes exclusivement téléphoniques, prévoir un second facteur ou une méthode de récupération fiable.
 
