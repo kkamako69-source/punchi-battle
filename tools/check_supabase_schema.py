@@ -135,7 +135,7 @@ def main() -> int:
     for fragment in required_counter:
         if fragment not in counter_migration:
             errors.append(f"compteur de votes sécurisé manquant : {fragment}")
-    if "create view public.entry_vote_totals" in hardening_migration:
+    if "create or replace view public.entry_vote_totals" in hardening_migration or "create view public.entry_vote_totals" in hardening_migration:
         errors.append("vue publique privilégiée de votes toujours présente")
     if "is_active)\nvalues" not in seed or ", false)" not in seed:
         errors.append("les thèmes de départ doivent rester inactifs par défaut")
