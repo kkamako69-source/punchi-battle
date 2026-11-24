@@ -1113,6 +1113,40 @@
     
         /* ==================== LIVE SUPABASE AREA ==================== */
 
+        /* Member application shell replaces the old static showcase in production. */
+        body > header, body > main, body > footer { display:none !important; }
+        .pb-cloud-nav {
+            display:flex; flex-wrap:nowrap; gap:.55rem; overflow-x:auto; padding:.4rem 0 1rem;
+            margin:.9rem 0 .2rem; border-bottom:1px solid rgba(255,255,255,.09);
+            scrollbar-width:thin;
+        }
+        .pb-cloud-menu-button {
+            display:inline-flex; align-items:center; justify-content:center; gap:.45rem;
+            min-height:43px; flex:0 0 auto; padding:.65rem 1rem; border:1px solid rgba(255,255,255,.15);
+            border-radius:12px; color:#dce8ef; background:rgba(255,255,255,.045); font:inherit;
+            font-weight:800; cursor:pointer; transition:background .18s ease,border-color .18s ease;
+        }
+        .pb-cloud-menu-button[aria-disabled="true"] { opacity:.68; border-style:dashed; }
+        .pb-cloud-menu-button.active { color:#041719; background:#00fff7; border-color:#00fff7; }
+        .pb-cloud-menu-button:focus-visible { outline:3px solid #ffe79a; outline-offset:3px; }
+        .pb-cloud-view-panel { margin-top:1rem; }
+        .pb-cloud-profile { padding:1.1rem; margin-bottom:1rem; border:1px solid rgba(0,255,247,.2); border-radius:15px; background:rgba(0,255,247,.045); }
+        .pb-cloud-profile h3 { margin-bottom:.35rem; color:#00fff7; font-family:'Bebas Neue',sans-serif; font-size:1.8rem; }
+        .pb-cloud-profile p { color:#b9cbd4; line-height:1.55; font-size:.86rem; overflow-wrap:anywhere; }
+        .pb-cloud-ranking-list { display:grid; gap:.65rem; }
+        .pb-cloud-rank { display:grid; grid-template-columns:48px minmax(0,1fr) auto; align-items:center; gap:.7rem; padding:.85rem; border:1px solid rgba(255,255,255,.09); border-radius:13px; background:rgba(255,255,255,.035); }
+        .pb-cloud-rank-number { display:grid; place-items:center; width:40px; height:40px; border-radius:11px; color:#ffe79a; background:rgba(255,215,0,.09); font-weight:900; }
+        .pb-cloud-rank-name { min-width:0; overflow-wrap:anywhere; font-weight:850; }
+        .pb-cloud-rank-sub { color:#aebfc8; font-size:.78rem; margin-top:.18rem; }
+        .pb-cloud-rank-score { color:#00fff7; font-weight:900; text-align:right; white-space:nowrap; }
+        .pb-cloud-empty-state { padding:1.1rem; border:1px dashed rgba(255,255,255,.15); border-radius:13px; color:#aab9c4; line-height:1.55; }
+        @media(max-width:600px) {
+            .pb-cloud-menu-button { padding:.6rem .8rem; font-size:.86rem; }
+            .pb-cloud-rank { grid-template-columns:40px minmax(0,1fr); }
+            .pb-cloud-rank-score { grid-column:2; text-align:left; }
+        }
+
+
         /* ==================== MEMBER ACCESS AND PRIVATE CONTACTS ==================== */
         .pb-cloud-auth { grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); }
         .pb-cloud-privacy-note { color:#a9bdc6; font-size:.78rem; line-height:1.5; margin-top:.55rem; }
@@ -1314,10 +1348,16 @@
       <p class="pb-cloud-message" id="pb-cloud-auth-message" role="status" aria-live="polite" hidden></p>
       <p class="pb-cloud-privacy-note" style="margin-top:.9rem">En créant un compte, tu acceptes le traitement des données nécessaire au fonctionnement de Punchi Battle. Consulte la <a class="pb-cloud-link" href="politique-confidentialite.html">politique de confidentialité</a>.</p>
 
-      <p class="pb-cloud-empty" id="pb-cloud-login-note">Les visiteurs peuvent consulter l’arène. Connecte-toi pour voter ou proposer une punchline lorsqu’un thème est ouvert.</p>
+      <p class="pb-cloud-empty" id="pb-cloud-login-note">Les menus Arène, Classement et Mon profil sont verrouillés. Inscris-toi ou connecte-toi, puis accepte la politique pour accéder à ton espace membre.</p>
+
+      <nav class="pb-cloud-nav" id="pb-cloud-member-nav" aria-label="Menus de Punchi Battle">
+        <button class="pb-cloud-menu-button active" type="button" data-pb-view="arena" aria-disabled="true">⚔️ Arène <span class="pb-nav-lock" aria-hidden="true">🔒</span></button>
+        <button class="pb-cloud-menu-button" type="button" data-pb-view="ranking" aria-disabled="true">🏆 Classement <span class="pb-nav-lock" aria-hidden="true">🔒</span></button>
+        <button class="pb-cloud-menu-button" type="button" data-pb-view="profile" aria-disabled="true">👤 Mon profil <span class="pb-nav-lock" aria-hidden="true">🔒</span></button>
+      </nav>
 
       <div id="pb-cloud-member-content" hidden>
-      <div class="pb-cloud-columns">
+      <section class="pb-cloud-view-panel" id="pb-cloud-view-arena" data-pb-view-panel>
         <section class="pb-cloud-card" aria-labelledby="pb-cloud-theme-heading">
           <h3 class="pb-cloud-section-title" id="pb-cloud-theme-heading">Thèmes ouverts</h3>
           <div id="pb-cloud-themes"><p class="pb-cloud-empty">Chargement des thèmes…</p></div>
@@ -1347,6 +1387,62 @@
           <button class="pb-cloud-button" type="submit">Envoyer pour modération</button>
           <p class="pb-cloud-message" id="pb-cloud-entry-message" role="status" aria-live="polite" hidden></p>
         </form>
+      </section>
+      </section>
+
+      <section class="pb-cloud-view-panel" id="pb-cloud-view-ranking" data-pb-view-panel hidden aria-labelledby="pb-cloud-ranking-title">
+        <div class="pb-cloud-heading">
+          <div>
+            <p class="pb-cloud-kicker">Résultats vérifiés</p>
+            <h3 id="pb-cloud-ranking-title">Classement des MC</h3>
+          </div>
+          <p class="pb-cloud-status">Trié selon les votes enregistrés sur les participations publiées.</p>
+        </div>
+        <div class="pb-cloud-ranking-list" id="pb-cloud-leaderboard">
+          <p class="pb-cloud-empty-state">Le classement se construit à partir des premières battles validées.</p>
+        </div>
+      </section>
+
+      <section class="pb-cloud-view-panel" id="pb-cloud-view-profile" data-pb-view-panel hidden aria-labelledby="pb-cloud-profile-title">
+        <div class="pb-cloud-profile">
+          <p class="pb-cloud-kicker">Espace personnel</p>
+          <h3 id="pb-cloud-profile-title">Mon profil MC</h3>
+          <p id="pb-cloud-profile-name">Ton nom de guerrier</p>
+          <p id="pb-cloud-profile-handle">Ton identifiant</p>
+          <p id="pb-cloud-profile-primary">Ton identifiant de connexion reste privé.</p>
+        </div>
+<section class="pb-contact-panel" aria-labelledby="pb-contact-heading">
+    <h3 id="pb-contact-heading">Coordonnées privées du compte</h3>
+    <p class="pb-cloud-privacy-note">Ton identifiant principal est géré par Supabase Auth. Les coordonnées secondaires ci-dessous sont enregistrées dans une table privée, accessibles uniquement à ton compte. Elles ne figurent jamais sur ton profil public et ne servent pas à la publicité.</p>
+    <div class="pb-contact-readout" style="margin-top:.8rem">
+        <strong>Identifiant principal du compte</strong>
+        <span id="pb-contact-primary">Chargement…</span>
+        <span class="pb-cloud-privacy-note" id="pb-contact-primary-type"></span>
+    </div>
+    <form id="pb-cloud-contact-form">
+        <div class="pb-contact-grid">
+            <div class="pb-cloud-field">
+                <label for="pb-contact-email">E-mail secondaire (facultatif)</label>
+                <input id="pb-contact-email" type="email" autocomplete="email" maxlength="254" placeholder="nom@exemple.com">
+            </div>
+            <div class="pb-cloud-field">
+                <label for="pb-contact-phone">Téléphone secondaire (facultatif)</label>
+                <input id="pb-contact-phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="16" placeholder="+242XXXXXXXXX ou +33XXXXXXXXX">
+            </div>
+            <div class="pb-cloud-field">
+                <label for="pb-contact-country">Pays de résidence (code ISO-2)</label>
+                <input id="pb-contact-country" type="text" value="CG" maxlength="2" pattern="[A-Za-z]{2}" autocomplete="country" placeholder="CG, CD, FR…">
+            </div>
+        </div>
+        <label class="pb-contact-consent">
+            <input id="pb-contact-consent" type="checkbox">
+            <span>J’autorise l’enregistrement privé de ces coordonnées pour la gestion de mon compte, les alertes de sécurité et les communications liées à mes battles. Je comprends que ces coordonnées secondaires ne sont pas vérifiées automatiquement et ne sont pas affichées publiquement.</span>
+        </label>
+        <button class="pb-cloud-button" type="submit">Enregistrer mes coordonnées privées</button>
+        <p class="pb-cloud-message" id="pb-cloud-contact-message" role="status" aria-live="polite" hidden></p>
+    </form>
+    <p class="pb-cloud-privacy-note">Tu peux effacer les coordonnées secondaires en vidant les deux champs puis en enregistrant. Ton adresse e-mail ou ton numéro principal reste géré séparément par le service d’authentification.</p>
+</section>
       </section>
       </div>
     </section>
@@ -1574,38 +1670,7 @@
                 </div>
             </div>
 
-            <section class="pb-contact-panel" aria-labelledby="pb-contact-heading">
-                <h3 id="pb-contact-heading">Coordonnées privées du compte</h3>
-                <p class="pb-cloud-privacy-note">Ton identifiant principal est géré par Supabase Auth. Les coordonnées secondaires ci-dessous sont enregistrées dans une table privée, accessibles uniquement à ton compte. Elles ne figurent jamais sur ton profil public et ne servent pas à la publicité.</p>
-                <div class="pb-contact-readout" style="margin-top:.8rem">
-                    <strong>Identifiant principal du compte</strong>
-                    <span id="pb-contact-primary">Chargement…</span>
-                    <span class="pb-cloud-privacy-note" id="pb-contact-primary-type"></span>
-                </div>
-                <form id="pb-cloud-contact-form">
-                    <div class="pb-contact-grid">
-                        <div class="pb-cloud-field">
-                            <label for="pb-contact-email">E-mail secondaire (facultatif)</label>
-                            <input id="pb-contact-email" type="email" autocomplete="email" maxlength="254" placeholder="nom@exemple.com">
-                        </div>
-                        <div class="pb-cloud-field">
-                            <label for="pb-contact-phone">Téléphone secondaire (facultatif)</label>
-                            <input id="pb-contact-phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="16" placeholder="+242XXXXXXXXX ou +33XXXXXXXXX">
-                        </div>
-                        <div class="pb-cloud-field">
-                            <label for="pb-contact-country">Pays de résidence (code ISO-2)</label>
-                            <input id="pb-contact-country" type="text" value="CG" maxlength="2" pattern="[A-Za-z]{2}" autocomplete="country" placeholder="CG, CD, FR…">
-                        </div>
-                    </div>
-                    <label class="pb-contact-consent">
-                        <input id="pb-contact-consent" type="checkbox">
-                        <span>J’autorise l’enregistrement privé de ces coordonnées pour la gestion de mon compte, les alertes de sécurité et les communications liées à mes battles. Je comprends que ces coordonnées secondaires ne sont pas vérifiées automatiquement et ne sont pas affichées publiquement.</span>
-                    </label>
-                    <button class="pb-cloud-button" type="submit">Enregistrer mes coordonnées privées</button>
-                    <p class="pb-cloud-message" id="pb-cloud-contact-message" role="status" aria-live="polite" hidden></p>
-                </form>
-                <p class="pb-cloud-privacy-note">Tu peux effacer les coordonnées secondaires en vidant les deux champs puis en enregistrant. Ton adresse e-mail ou ton numéro principal reste géré séparément par le service d’authentification.</p>
-            </section>
+
 
             <div class="history-list">
                 <h3 style="font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; margin-bottom: 1rem; letter-spacing: 1px;">
