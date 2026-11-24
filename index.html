@@ -1269,18 +1269,18 @@
           <input id="pb-cloud-phone-number" type="tel" autocomplete="tel" inputmode="tel" placeholder="+242XXXXXXXXX ou +33XXXXXXXXX" maxlength="16" required>
         </div>
         <button class="pb-cloud-button" type="submit">Recevoir mon code SMS</button>
-        <div class="pb-phone-otp" id="pb-cloud-phone-code-panel" hidden>
-          <p class="pb-cloud-privacy-note">Code envoyé au <strong id="pb-cloud-phone-target"></strong>.</p>
-          <form id="pb-cloud-phone-verify">
-            <div class="pb-cloud-field">
-              <label for="pb-cloud-phone-code">Code à 6 chiffres</label>
-              <input id="pb-cloud-phone-code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" minlength="6" maxlength="6">
-            </div>
-            <button class="pb-cloud-button" type="submit">Vérifier et entrer</button>
-          </form>
-        </div>
-        <p class="pb-cloud-privacy-note">L’accès par SMS nécessite l’activation de l’authentification téléphone et d’un fournisseur SMS dans Supabase. Aucun fournisseur payant n’est activé automatiquement.</p>
       </form>
+      <div class="pb-phone-otp" id="pb-cloud-phone-code-panel" hidden>
+        <p class="pb-cloud-privacy-note">Code envoyé au <strong id="pb-cloud-phone-target"></strong>.</p>
+        <form id="pb-cloud-phone-verify">
+          <div class="pb-cloud-field">
+            <label for="pb-cloud-phone-code">Code à 6 chiffres</label>
+            <input id="pb-cloud-phone-code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" minlength="6" maxlength="6">
+          </div>
+          <button class="pb-cloud-button" type="submit">Vérifier et entrer</button>
+        </form>
+      </div>
+      <p class="pb-cloud-privacy-note">L’accès par SMS nécessite l’activation de l’authentification téléphone et d’un fournisseur SMS dans Supabase. Aucun fournisseur payant n’est activé automatiquement.</p>
 
       <div class="pb-cloud-account" id="pb-cloud-account" hidden>
         <div>
