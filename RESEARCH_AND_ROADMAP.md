@@ -55,12 +55,12 @@ Les conseillers Supabase ne signalent pas d’alerte de sécurité ni de santé.
 **Important :** la page GitHub Pages reste une démonstration locale. Le fait que la base existe n’active pas encore l’inscription, les votes ou les publications partagés. L’intégration front-end doit être faite et testée avec deux comptes et un visiteur anonyme avant ouverture publique.
 ## Prochaines étapes
 
-1. Connecter un environnement de prévisualisation avec la seule clé publishable ; garder tout secret côté serveur.
-2. Créer un flux d’authentification email avec confirmation et redirections explicites.
-3. Remplacer progressivement les données locales par des lectures/écritures Supabase après tests RLS.
-4. Mettre en place la modération côté serveur avant de publier les participations en attente.
-5. Tester chaque politique avec un visiteur anonyme et deux comptes distincts, puis vérifier votes, retraits, signalements et permissions.
-6. Préparer les exports, le contrôle des quotas et la procédure de sauvegarde avant l’ouverture au public.
+1. Configurer l’URL du site, l’URL de redirection et un SMTP personnalisé pour les inscriptions du public.
+2. Tester l’authentification e-mail avec deux comptes réels et la confirmation des adresses.
+3. Activer un thème uniquement quand les règles et la modération sont prêtes.
+4. Créer une interface de modération protégée avant l’ouverture plus large.
+5. Tester la lecture anonyme, la séparation des comptes, les votes, leur retrait et les compteurs publics.
+6. Préparer les sauvegardes, contrôler les quotas et vérifier les journaux après les premières connexions.
 
 ## Catalogue musical et métadonnées : limites d'utilisation
 
