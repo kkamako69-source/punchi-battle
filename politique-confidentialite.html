@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f0f1a">
+  <title>Politique de confidentialité | Punchi Battle</title>
+  <meta name="description" content="Comment Punchi Battle collecte, utilise, protège et conserve les données de compte et les coordonnées de ses membres.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <style>
+    :root{color-scheme:dark;--bg:#08080d;--panel:#121521;--line:rgba(0,255,247,.22);--cyan:#00fff7;--muted:#afbac8;--gold:#ffe79a}
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(circle at 10% 0%,#172233 0,transparent 36%),var(--bg);color:#f1f5f9;font:16px/1.65 Inter,system-ui,sans-serif}
+    main{width:min(920px,calc(100% - 2rem));margin:3rem auto;padding:clamp(1.2rem,4vw,2.8rem);background:rgba(18,21,33,.96);border:1px solid var(--line);border-radius:22px;box-shadow:0 22px 70px rgba(0,0,0,.3)}
+    h1,h2{line-height:1.15}h1{font-size:clamp(2rem,5vw,3.4rem);margin:.3rem 0 1rem}h2{margin:2rem 0 .7rem;color:var(--cyan);font-size:1.25rem}
+    p,li{color:#d7e0eb}a{color:var(--cyan);text-underline-offset:3px}.eyebrow{color:var(--cyan);font-size:.75rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase}
+    .notice{margin:1.3rem 0;padding:1rem 1.1rem;border:1px solid rgba(255,215,0,.32);border-radius:12px;background:rgba(255,215,0,.07);color:var(--gold)}
+    .facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem;margin:1.1rem 0}
+    .fact{padding:.9rem;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.03)}
+    .fact strong{display:block;color:#fff;font-size:.77rem;letter-spacing:.08em;text-transform:uppercase}.fact span{color:var(--muted);overflow-wrap:anywhere}
+    ul{padding-left:1.2rem}li{margin:.35rem 0}.small{font-size:.85rem;color:var(--muted)}
+    @media(max-width:640px){main{margin:1rem auto}.facts{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Punchi Battle · Protection des données</p>
+  <h1>Politique de confidentialité</h1>
+  <p class="small">Version provisoire PB-PRIVACY-2026-11-V1 · Date de mise à jour : 24 novembre 2026</p>
+  <div class="notice">
+    <strong>À finaliser avant l’ouverture publique.</strong>
+    L’identité légale, l’adresse et le contact du responsable du traitement doivent être ajoutés par l’exploitant de Punchi Battle. Les formalités applicables aux traitements et aux transferts internationaux doivent être vérifiées avec un conseil compétent en République du Congo.
+  </div>
+
+  <h2>1. Qui est responsable ?</h2>
+  <div class="facts">
+    <div class="fact"><strong>Responsable du traitement</strong><span>Exploitant de Punchi Battle — identité légale à compléter avant le lancement public.</span></div>
+    <div class="fact"><strong>Contact données personnelles</strong><span>Adresse e-mail et adresse postale de contact à compléter avant le lancement public.</span></div>
+  </div>
+
+  <h2>2. Quelles données sont utilisées ?</h2>
+  <ul>
+    <li><strong>Compte :</strong> adresse e-mail ou numéro de téléphone choisi comme identifiant de connexion, nom de guerrier et informations de session gérés par Supabase Auth.</li>
+    <li><strong>Coordonnées secondaires facultatives :</strong> adresse e-mail de secours, numéro au format international E.164 et code pays ISO-2. Elles sont stockées séparément dans une table privée.</li>
+    <li><strong>Activité :</strong> punchlines, commentaires, votes, signalements, thèmes suivis et dates techniques nécessaires au fonctionnement et à la modération.</li>
+    <li><strong>Profil public :</strong> pseudo, nom d’affichage, avatar si fourni, punchlines publiées et compteurs publics. Les adresses e-mail et les téléphones ne font jamais partie du profil public.</li>
+  </ul>
+
+  <h2>3. Pourquoi les données sont-elles utilisées ?</h2>
+  <ul>
+    <li>Créer et sécuriser les comptes et les sessions.</li>
+    <li>Faire fonctionner les battles, les participations, les votes et les classements.</li>
+    <li>Modérer les contenus, traiter les signalements et lutter contre le spam ou les abus.</li>
+    <li>Envoyer des messages strictement liés au compte ou à la sécurité lorsque le canal est configuré.</li>
+  </ul>
+  <p>Les coordonnées secondaires ne sont pas utilisées pour la publicité, la vente de fichiers de contacts ou la prospection commerciale. Aucune liste d’adresses ou de téléphones n’est visible aux autres membres.</p>
+
+  <h2>4. Coordonnées privées et numéros internationaux</h2>
+  <p>Les membres peuvent s’inscrire avec une adresse e-mail ou, après activation du service SMS, avec un numéro vérifié par code à usage unique. Le Congo est proposé comme pays par défaut pour les coordonnées secondaires, mais les numéros internationaux sont acceptés au format E.164 : par exemple +242… pour la République du Congo ou +33… pour la France.</p>
+  <p>Les coordonnées secondaires ne sont pas vérifiées automatiquement et ne doivent pas être considérées comme un moyen de récupération du compte tant qu’une procédure de vérification distincte n’est pas mise en place. Les numéros de téléphone peuvent être réattribués par les opérateurs : conserve un moyen de contact que tu contrôles et protège ton compte.</p>
+
+  <h2>5. Qui peut voir les données ?</h2>
+  <p>Les coordonnées de compte sont conservées dans Supabase Auth. Les coordonnées secondaires sont stockées dans <code>profile_contacts</code>, avec des règles d’accès qui autorisent uniquement le compte propriétaire à les consulter, modifier ou supprimer. Les visiteurs anonymes et les autres membres ne peuvent pas consulter ces lignes. Les mots de passe ne sont jamais enregistrés dans les tables publiques de Punchi Battle.</p>
+  <p>Les profils publics et les participations publiées sont visibles selon les règles de la plateforme. L’identité de chaque votant reste privée ; seul le total agrégé des votes est affiché.</p>
+
+  <h2>6. Hébergement et transferts internationaux</h2>
+  <p>Le projet Supabase utilisé par Punchi Battle a sa région principale en Europe occidentale, à Paris (France). Supabase indique que la base PostgreSQL, le service Auth et les objets de stockage principaux sont hébergés dans la région choisie. Certains traitements opérationnels, services d’assistance et sous-traitants peuvent néanmoins intervenir hors de cette région ; l’hébergement à Paris ne signifie donc pas que toute opération reste exclusivement en France.</p>
+  <p>La République du Congo dispose de la loi n° 29-2019 du 10 octobre 2019 relative à la protection des données à caractère personnel. La loi n° 5-2025 du 29 mars 2025 a créé la Commission nationale pour la protection des données à caractère personnel, et le décret n° 2025-538 du 31 décembre 2025 a nommé ses membres. Avant l’ouverture publique, le responsable doit vérifier auprès d’un conseil compétent et de la CNPD les formalités préalables, les informations à fournir et les conditions applicables à l’hébergement et aux transferts hors du Congo.</p>
+
+  <h2>7. Durée de conservation</h2>
+  <p>Les données du compte sont conservées pendant la durée d’utilisation du compte et aussi longtemps que nécessaire pour la sécurité, la modération ou les obligations applicables. Les coordonnées secondaires peuvent être effacées à tout moment depuis le menu Profil. La suppression du compte devra entraîner la suppression des données associées conformément aux règles de conservation et aux sauvegardes du service.</p>
+
+  <h2>8. Tes droits et tes choix</h2>
+  <ul>
+    <li>Consulter et corriger les coordonnées secondaires dans le menu « Mon profil ».</li>
+    <li>Effacer les coordonnées secondaires en vidant les champs puis en enregistrant.</li>
+    <li>Demander l’accès, la rectification ou la suppression des données du compte par le contact du responsable, à compléter avant le lancement public.</li>
+    <li>Retirer un consentement facultatif lorsque le traitement repose sur ce consentement, sous réserve des traitements qui reposent sur une autre base légale.</li>
+  </ul>
+
+  <h2>9. Sécurité</h2>
+  <p>Punchi Battle applique des règles d’accès par compte (RLS), des privilèges SQL limités et une séparation entre profil public et coordonnées privées. La clé publishable utilisée par le site ne remplace pas ces règles. Les clés secrètes et les clés d’administration ne sont pas intégrées au code envoyé au navigateur.</p>
+
+  <h2>10. Cookies et stockage local</h2>
+  <p>Le client d’authentification conserve une session dans le navigateur pour éviter de demander une reconnexion à chaque page. Une ancienne zone de démonstration locale peut également conserver des données fictives sur l’appareil ; elles sont indépendantes des données réelles du compte.</p>
+
+  <p class="small">Cette notice décrit l’architecture mise en place au 24 novembre 2026. Elle ne constitue pas un avis juridique ni une attestation de conformité. Elle devra être complétée et validée par le responsable du traitement avant les inscriptions publiques.</p>
+  <p><a href="index.html">← Retour à Punchi Battle</a></p>
+</main>
+</body>
+</html>
