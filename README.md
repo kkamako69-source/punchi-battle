@@ -1,38 +1,48 @@
 # Punchi Battle — L’Arène des Mots
 
-Site web de présentation du concept **Punchi Battle** : des participants proposent des punchlines autour d’un thème et la communauté peut les comparer et voter.
+Punchi Battle est une plateforme de battles de punchlines : un thème est ouvert, les MC proposent leurs textes, une modération valide les participations, puis la communauté vote.
 
-## Fichiers
-- `index.html` : interface principale.
-- `main.css` : styles.
-- `index.html1` : fichier de type copie/ancienne version ; le comparer à `index.html` avant de le supprimer.
+## État du projet au 24 novembre 2026
 
-## Tester le site
-Ouvre `index.html` dans un navigateur pour une vérification visuelle. Les fonctions qui nécessitent un service distant, une connexion ou une base de données doivent être testées séparément.
+- Le site GitHub Pages comprend une nouvelle zone **Arène en ligne** reliée au backend Supabase.
+- Les comptes utilisent Supabase Auth ; les profils, thèmes, punchlines et votes sont stockés dans PostgreSQL.
+- Les punchlines nouvellement envoyées restent en attente de modération. Seules les participations publiées apparaissent dans le flux public.
+- Le compteur de votes est visible publiquement, mais l'identité des votants reste privée.
+- L'ancienne maquette locale reste en dessous de l'espace en ligne pour comparaison ; ses statistiques et interactions sont fictives et indépendantes de la vraie base.
+- Les six thèmes sont volontairement fermés jusqu'à ce qu'un responsable soit prêt à ouvrir une battle.
 
-## Publication
-GitHub Pages est activé pour ce dépôt. Pour vérifier l’adresse exacte et la branche publiée, ouvre **Settings → Pages** dans GitHub.
+**Avant d'ouvrir au public :** configure l'URL et la redirection Auth, un SMTP personnalisé et la modération. Le SMTP de test Supabase intégré n'est pas adapté à des inscriptions publiques. Voir [Configuration Supabase](supabase/CONFIGURATION.md).
 
-## À vérifier avant une ouverture publique
-- Tester sur mobile et ordinateur, y compris les formulaires et les liens.
-- Confirmer si les votes et les comptes sont uniquement simulés côté navigateur ou reliés à un backend.
-- Ajouter une validation serveur, une protection anti-abus et une politique de confidentialité si des comptes ou votes réels sont collectés.
-- Conserver une copie/version de sauvegarde avant les changements qui touchent l’interface.
+## Structure
 
-> État documenté : prototype front-end ; les fonctions de production doivent être validées avant de les présenter comme opérationnelles.
+- `index.html` : site principal, espace en ligne et ancienne maquette de présentation.
+- `supabase.js` : client navigateur Supabase épinglé à `@supabase/supabase-js@2.119.2`, avec une clé publishable uniquement.
+- `supabase/migrations/` : quatre migrations SQL versionnées et appliquées au projet connecté.
+- `supabase/seed.sql` : six thèmes initiaux, tous inactifs.
+- `supabase/README.md` : architecture réelle, privilèges, contrôles et statut.
+- `supabase/CONFIGURATION.md` : URL Auth, SMTP, modération et étapes avant lancement.
+- `RESEARCH_AND_ROADMAP.md` : ressources, licences, stratégie et étapes futures.
 
-## Contrôle automatique
+## Sécurité de la base
 
-Le contrôle de structure HTML peut être lancé localement avec :
+Les six tables publiques ont RLS activée. Les privilèges SQL sont limités par colonne pour les INSERT ; les statuts de modération et les horodatages sont gérés côté base. Les votes sont uniques par compte et par participation. Une fonction privée met à jour uniquement le total public sans exposer les identités des votants. Des limites serveur réduisent le spam : 5 punchlines par compte sur 24 heures, 20 commentaires par heure.
+
+Ne place jamais de clé `sb_secret_...`, `service_role`, mot de passe PostgreSQL ou secret SMTP dans GitHub ou dans le navigateur.
+
+## Contrôles
 
 ```sh
 python tools/check_site.py
+node tools/check_inline_js.cjs
+node --input-type=module --check < supabase.js
+python tools/check_supabase_schema.py
 ```
 
-GitHub Actions lance aussi ce contrôle à chaque modification de la branche `main` et pour chaque pull request. Les avertissements (par exemple un fragment HTML ou une ressource locale introuvable) doivent être examinés ; un passage réussi ne remplace pas les tests dans un vrai navigateur.
+GitHub Actions exécute les contrôles HTML, JavaScript classique, le module navigateur et les contrôles de schéma. CodeQL analyse le JavaScript et Dependabot suit chaque semaine les GitHub Actions.
 
-## Données et sécurité
+## Liens
 
-Le site est actuellement une démonstration locale : votes et participations ne sont pas encore partagés entre utilisateurs. Le schéma Supabase préparatoire est dans [supabase/migrations](supabase/migrations/202611210001_punchi_battle_schema.sql) et son guide est dans [supabase/README.md](supabase/README.md). Il doit être appliqué et testé dans un projet Supabase avant toute connexion du site. Ne publie jamais une clé `service_role` dans le navigateur.
-
-La recherche technique et les sources de données candidates sont documentées dans [RESEARCH_AND_ROADMAP.md](RESEARCH_AND_ROADMAP.md).
+- [Projet GitHub](https://github.com/kkamako69-source/punchi-battle)
+- [Site publié](https://kkamako69-source.github.io/punchi-battle/)
+- [Backend Supabase](https://supabase.com/dashboard/project/ppuhpuuuxohokuzfctpq)
+- [Politique de sécurité](SECURITY.md)
