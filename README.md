@@ -5,12 +5,12 @@ Punchi Battle est une plateforme de battles de punchlines : un thème est ouvert
 ## État au 24 novembre 2026
 
 - Le site possède un portail d’inscription/connexion par e-mail ou téléphone.
-- Les menus **Battles**, **Classement** et **Mon profil** restent verrouillés tant que le compte n’est pas authentifié et que la version courante de la politique de confidentialité n’a pas été acceptée.
+- Les menus **Arène**, **Classement** et **Mon profil** sont trois écrans distincts ; ils restent verrouillés tant que le compte n’est pas authentifié et que la version courante de la politique n’a pas été acceptée.
 - La base PostgreSQL utilise huit tables, RLS sur chacune et 22 politiques.
 - Les coordonnées principales restent dans Supabase Auth. Les coordonnées secondaires sont dans une table privée distincte.
 - Les visiteurs anonymes n’ont aucun privilège SQL de lecture ou d’écriture sur les huit tables.
 - Les six thèmes sont volontairement fermés jusqu’à ce que la modération soit prête.
-- L’ancienne maquette locale reste disponible comme démonstration, séparée de la vraie base. Ses chiffres ne sont pas des statistiques réelles.
+- L’ancienne maquette locale est conservée dans le code historique, mais elle est masquée dans le parcours membre : aucun faux score n’est présenté comme un résultat réel.
 
 ## Parcours de compte
 
@@ -34,9 +34,9 @@ Voir [Configuration Supabase](supabase/CONFIGURATION.md) et [Politique de confid
 
 ## Architecture
 
-- `index.html` : interface principale, espace de compte, menus membres et démonstration locale.
+- `index.html` : shell membre, portail d’accès, menus Arène/Classement/Profil et notice de confidentialité.
 - `supabase.js` : client navigateur épinglé à `@supabase/supabase-js@2.119.2`, avec clé publishable uniquement.
-- `supabase/migrations/` : dix migrations SQL versionnées et appliquées au projet Supabase.
+- `supabase/migrations/` : onze migrations SQL versionnées et appliquées au projet Supabase.
 - `supabase/seed.sql` : six thèmes de départ désactivés.
 - `supabase/README.md` : architecture réelle, sécurité, privilèges et état.
 - `supabase/CONFIGURATION.md` : URL Auth, e-mail, SMS, CAPTCHA, modération et lancement.
