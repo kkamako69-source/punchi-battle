@@ -368,13 +368,18 @@ async function loadCloudData() {
     if (rankingError) throw rankingError;
     renderCloudLeaderboard(ranking || []);
 
-    const ownRanking = (ranking || []).find((row) => row.author_id === currentUser.id);
+    const { data: ownRanking, error: ownRankingError } = await supabase
+      .from("member_leaderboard")
+      .select("submissions_count, votes_total, rank_number")
+      .eq("author_id", currentUser.id)
+      .maybeSingle();
+    if (ownRankingError) throw ownRankingError;
     $("pb-cloud-profile-submissions").textContent =
       Number(ownRanking?.submissions_count || 0).toLocaleString("fr-FR");
     $("pb-cloud-profile-votes").textContent =
       Number(ownRanking?.votes_total || 0).toLocaleString("fr-FR");
-    const ownRank = ownRanking ? ranking.findIndex((row) => row.author_id === currentUser.id) + 1 : 0;
-    $("pb-cloud-profile-rank").textContent = ownRank ? "#" + ownRank : "Non classé";
+    $("pb-cloud-profile-rank").textContent =
+      ownRanking?.rank_number ? "#" + Number(ownRanking.rank_number).toLocaleString("fr-FR") : "Non classé";
 
     if (currentUser) {
       const { data: pending, error: pendingError } = await supabase
