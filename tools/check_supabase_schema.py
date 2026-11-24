@@ -12,6 +12,8 @@ HARDENING_MIGRATION = ROOT / "supabase/migrations/20261124121800_harden_write_pa
 COUNTER_MIGRATION = ROOT / "supabase/migrations/20261124122000_replace_vote_view_with_private_counter.sql"
 RATE_LIMIT_LOCK_MIGRATION = ROOT / "supabase/migrations/20261124123000_serialize_rate_limits.sql"
 THEME_WINDOW_MIGRATION = ROOT / "supabase/migrations/20261124123500_filter_themes_by_open_window.sql"
+CONTACT_MIGRATION = ROOT / "supabase/migrations/20261124122000_private_contact_details.sql"
+CONSENT_MIGRATION = ROOT / "supabase/migrations/20261124130000_record_privacy_consent.sql"
 SEED = ROOT / "supabase/seed.sql"
 
 TABLES = ("profiles", "themes", "entries", "votes", "comments", "reports")
@@ -73,6 +75,18 @@ def main() -> int:
         theme_window_migration = ""
     else:
         theme_window_migration = THEME_WINDOW_MIGRATION.read_text(encoding="utf-8").lower()
+
+    if not CONTACT_MIGRATION.is_file():
+        errors.append("migration de coordonnées privées manquante")
+        contact_migration = ""
+    else:
+        contact_migration = CONTACT_MIGRATION.read_text(encoding="utf-8").lower()
+
+    if not CONSENT_MIGRATION.is_file():
+        errors.append("migration de consentement versionné manquante")
+        consent_migration = ""
+    else:
+        consent_migration = CONSENT_MIGRATION.read_text(encoding="utf-8").lower()
 
     if not SEED.is_file():
         errors.append("catalogue seed SQL manquant")
@@ -163,10 +177,10 @@ def main() -> int:
 
     print(
         "OK : "
-        + str(len(TABLES))
+        + str(len(TABLES) + 2)
         + " tables, "
-        + str(len(REQUIRED_POLICIES) + 1)
-        + " policies attendues, privilèges limités, anti-spam, compteur de votes privé et index vérifiés."
+        + str(len(REQUIRED_POLICIES) + 1 + 4 + 2)
+        + " policies attendues, coordonnées privées, consentement versionné, privilèges limités, anti-spam et compteurs sécurisés vérifiés."
     )
     print("NOTE : vérification statique uniquement ; les tests RLS avec un visiteur et plusieurs comptes réels restent nécessaires.")
     return 0
