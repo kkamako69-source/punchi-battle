@@ -72,6 +72,31 @@ Les sources audio sous licence Creative Commons ne sont pas automatiquement util
 
 Sources candidates : https://mtg.github.io/mtg-jamendo-dataset/ · https://huggingface.co/datasets/benjamin-paine/free-music-archive-full
 
+
+## État actualisé au 24 novembre 2026 — parcours membre et contacts
+
+Le backend a maintenant **10 migrations appliquées**, huit tables avec RLS et 22 policies. Les rôles `PUBLIC` et `anon` n’ont aucun privilège SQL sur les tables membres. Les opérations sont ouvertes aux membres authentifiés seulement lorsque leur consentement courant figure dans `account_consents`.
+
+Le parcours comprend :
+- inscription/connexion e-mail + mot de passe, avec confirmation e-mail ;
+- inscription/connexion par OTP SMS en E.164, du Congo ou de tout autre pays ;
+- verrouillage des menus Battles, Classement et Mon profil avant authentification et consentement ;
+- stockage séparé des coordonnées secondaires dans `profile_contacts`, visible uniquement par leur propriétaire ;
+- enregistrement append-only de la version de la politique acceptée ;
+- contrôles CI du HTML, des références DOM, du module Supabase, des privilèges privés et des formulaires.
+
+**Services à configurer avant le lancement :** SMTP personnalisé, fournisseur SMS, CAPTCHA et rate limits. Aucun fournisseur SMS payant n’est activé. Le téléphone peut être recyclé ; une adresse e-mail contrôlée est recommandée pour limiter le risque de perte d’accès. Les coordonnées secondaires restent facultatives et non vérifiées.
+
+**Vie privée / droit :** la notice est provisoire et ne doit pas être présentée comme une preuve de conformité. Le responsable doit compléter son identité et son contact, puis vérifier les obligations de la loi congolaise 29-2019, la CNPD créée par la loi 5-2025 et les transferts transfrontaliers. Le projet Supabase est dans eu-west-3 Paris : le choix de région encadre l’emplacement principal, mais n’est pas à lui seul une garantie de conformité ni d’exclusivité du traitement dans cette région.
+
+Sources officielles :
+- Loi n° 29-2019 (Journal officiel SGG) : https://www.sgg.cg/JO/2019/congo-jo-2019-45.pdf
+- Loi n° 5-2025 (CNPD) : https://www.oarh.cg/wp-content/uploads/2026/09/Loi-n%C2%B05-2025-du-29-mars-2025-portant-creation-de-la-commission-nationale-pour-la-protection-des-donnees-a-caractere-personnel.pdf
+- Décret n° 2025-538 (nomination des membres CNPD) : https://www.sgg.cg/JO/2026/congo-jo-2026-5-2.pdf
+- Authentification téléphone Supabase : https://supabase.com/docs/guides/auth/phone-login
+- Risque de réattribution des numéros : https://supabase.com/docs/guides/auth/passwords
+- Résidence et traitement des données Supabase : https://supabase.com/docs/guides/platform/regions
+
 ## Évolution et maintenance
 
 - Préférer des métadonnées structurées sous CC0 (par exemple Wikidata) et un catalogue d'enregistrements avec licences individuelles.
