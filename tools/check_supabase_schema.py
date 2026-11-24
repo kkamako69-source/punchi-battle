@@ -27,7 +27,6 @@ REQUIRED_POLICIES = (
     "votes_delete_own",
     "comments_read_published_or_own",
     "comments_submit_pending",
-    "comments_delete_own_pending",
     "reports_read_own",
     "reports_submit_visible_target",
 )
@@ -112,6 +111,7 @@ def main() -> int:
         "revoke insert on public.votes from authenticated",
         "grant insert (entry_id, voter_id) on public.votes to authenticated",
         "grant delete on public.comments to authenticated",
+        "comments_delete_own_pending",
         "create trigger entries_submission_rate_limit",
         "create trigger comments_submission_rate_limit",
         "revoke all on function public.enforce_submission_rate_limit() from public, anon, authenticated",
