@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 import re
 import sys
+from html.parser import HTMLParser
 
 ROOT = Path(__file__).resolve().parents[1]
 HTML = ROOT / "index.html"
@@ -13,6 +14,23 @@ CLIENT = ROOT / "supabase.js"
 
 def fail(message: str) -> None:
     print("ERREUR:", message, file=sys.stderr)
+
+
+class FormNestingChecker(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.form_open = False
+        self.errors: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs) -> None:
+        if tag.lower() == "form":
+            if self.form_open:
+                self.errors.append("formulaire HTML imbriqué détecté")
+            self.form_open = True
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag.lower() == "form":
+            self.form_open = False
 
 
 def main() -> int:
@@ -50,6 +68,29 @@ def main() -> int:
         errors.append("texte de punchline non échappé avant affichage")
     if 'aria-live="polite"' not in html:
         errors.append("messages d’état accessibles (aria-live) absents")
+
+    for table in ("profile_contacts", "account_consents"):
+        if f'.from("{table}")' not in client:
+            errors.append(f"table privée {table} non utilisée par le client")
+
+    for required in ("signInWithOtp", "verifyOtp", "normalizeE164", "PRIVACY_POLICY_VERSION", "recordPrivacyConsent"):
+        if required not in client:
+            errors.append(f"fonction de compte international / consentement manquante : {required}")
+
+    if "window.PunchiBattleAuth?.isAuthenticated !== true" not in html:
+        errors.append("verrouillage des menus avant inscription manquant")
+    if 'data-auth-required="true"' not in html:
+        errors.append("état visuel des menus verrouillés absent")
+    if "pb-cloud-phone-privacy-consent" not in html or "pb-cloud-privacy-consent" not in html:
+        errors.append("acceptation de la politique requise à l’inscription manquante")
+    if "pb-cloud-existing-consent" not in html:
+        errors.append("renouvellement du consentement pour les comptes existants manquant")
+    if "politique-confidentialite.html" not in html:
+        errors.append("lien vers la politique de confidentialité absent")
+
+    form_checker = FormNestingChecker()
+    form_checker.feed(html)
+    errors.extend(form_checker.errors)
 
     if errors:
         for error in errors:
