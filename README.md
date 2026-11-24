@@ -36,6 +36,7 @@ python tools/check_site.py
 node tools/check_inline_js.cjs
 node --input-type=module --check < supabase.js
 python tools/check_supabase_schema.py
+python tools/check_punchi_frontend.py
 ```
 
 GitHub Actions exécute les contrôles HTML, JavaScript classique, le module navigateur et les contrôles de schéma. CodeQL analyse le JavaScript et Dependabot suit chaque semaine les GitHub Actions.
