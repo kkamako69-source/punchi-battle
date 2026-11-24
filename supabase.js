@@ -274,7 +274,7 @@ function renderCloudLeaderboard(rows) {
   }
 
   leaderboardNode.innerHTML = rows.map((row, index) => {
-    const rank = index + 1;
+    const rank = Number(row.rank_number || index + 1);
     const name = row.display_name || row.username || "MC";
     return '<article class="pb-cloud-rank">' +
       '<div class="pb-cloud-rank-number">#' + rank + '</div>' +
@@ -361,9 +361,10 @@ async function loadCloudData() {
 
     const { data: ranking, error: rankingError } = await supabase
       .from("member_leaderboard")
-      .select("author_id, username, display_name, submissions_count, votes_total")
+      .select("author_id, username, display_name, submissions_count, votes_total, rank_number")
       .order("votes_total", { ascending: false })
       .order("submissions_count", { ascending: false })
+      .order("username", { ascending: true })
       .limit(50);
     if (rankingError) throw rankingError;
     renderCloudLeaderboard(ranking || []);
