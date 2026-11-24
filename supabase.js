@@ -204,7 +204,11 @@ function renderSession() {
       currentProfile?.username ? "@" + currentProfile.username : "";
     $("pb-cloud-profile-primary").textContent =
       isSignedIn ? (currentUser.email || currentUser.phone || "Identifiant de connexion géré par Supabase Auth") : "";
+    $("pb-cloud-profile-joined").textContent =
+      isSignedIn && currentUser.created_at ? safeDate(currentUser.created_at) : "—";
   }
+  $("pb-cloud-primary-contact").textContent =
+    isSignedIn ? (currentUser.email || currentUser.phone || "Compte membre") : "";
   renderProtectedNavigation();
 }
 
@@ -364,6 +368,14 @@ async function loadCloudData() {
     if (rankingError) throw rankingError;
     renderCloudLeaderboard(ranking || []);
 
+    const ownRanking = (ranking || []).find((row) => row.author_id === currentUser.id);
+    $("pb-cloud-profile-submissions").textContent =
+      Number(ownRanking?.submissions_count || 0).toLocaleString("fr-FR");
+    $("pb-cloud-profile-votes").textContent =
+      Number(ownRanking?.votes_total || 0).toLocaleString("fr-FR");
+    const ownRank = ownRanking ? ranking.findIndex((row) => row.author_id === currentUser.id) + 1 : 0;
+    $("pb-cloud-profile-rank").textContent = ownRank ? "#" + ownRank : "Non classé";
+
     if (currentUser) {
       const { data: pending, error: pendingError } = await supabase
         .from("entries")
@@ -399,11 +411,8 @@ async function loadCloudData() {
 }
 
 async function recordPrivacyConsent(user) {
-  const metadata = user?.user_metadata || {};
-  if (metadata.pb_privacy_version !== PRIVACY_POLICY_VERSION || metadata.pb_privacy_accepted !== true) {
-    return false;
-  }
-
+  // The database record is authoritative. user_metadata is only used to carry
+  // the signup checkbox assertion until an append-only consent row exists.
   const { data: existing, error: readError } = await supabase
     .from("account_consents")
     .select("id")
@@ -414,6 +423,11 @@ async function recordPrivacyConsent(user) {
 
   if (readError) throw readError;
   if (existing) return true;
+
+  const metadata = user?.user_metadata || {};
+  if (metadata.pb_privacy_version !== PRIVACY_POLICY_VERSION || metadata.pb_privacy_accepted !== true) {
+    return false;
+  }
 
   const { error: insertError } = await supabase
     .from("account_consents")
