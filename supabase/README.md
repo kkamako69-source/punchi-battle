@@ -8,7 +8,7 @@ Le projet Supabase `punchi-battle` se trouve dans `Specimens Org`, région `eu-w
 - API : https://ppuhpuuuxohokuzfctpq.supabase.co
 - État observé : `ACTIVE_HEALTHY`
 - PostgreSQL : 17.12
-- **11 migrations appliquées**
+- **12 migrations appliquées**
 - **8 tables**, RLS sur chacune, **22 policies**
 - 6 thèmes de départ, tous inactifs
 - Aucun compte, aucune participation, aucun vote, aucun commentaire et aucune coordonnée secondaire réelle n’ont encore été enregistrés.
@@ -82,6 +82,7 @@ Le notebook SQL [Punchi Battle — audit continu](https://supabase.com/dashboard
 - `migrations/20261124131000_require_current_member_consent.sql` — consentement obligatoire dans les policies.
 - `migrations/20261124131500_revoke_inherited_anon_privileges.sql` — suppression des privilèges anonymes hérités.
 - `migrations/20261124132000_member_leaderboard_view.sql` — vue de classement `SECURITY INVOKER` respectant RLS.
+- `migrations/20261124132500_add_member_leaderboard_rank.sql` — rang global réel, même au-delà du Top 50.
 - `seed.sql` — six thèmes inactifs.
 - `../supabase.js` — client navigateur épinglé à `@supabase/supabase-js@2.119.2`.
 - `CONFIGURATION.md` — réglages Auth/SMTP/SMS.
