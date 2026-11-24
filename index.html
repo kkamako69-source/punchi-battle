@@ -1112,6 +1112,20 @@
         }
     </style>
 <base target="_blank">
+<style id="accessibility-enhancements">
+:where(a,button,input,select,textarea,[tabindex]):focus-visible {
+  outline: 3px solid #00fff7 !important;
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+</style>
 </head>
 
 <body>
@@ -1121,7 +1135,7 @@
     <!-- HEADER -->
     <header>
         <div class="logo" onclick="navigateTo('home')">
-            <img src="https://kimi-web-img.moonshot.cn/img/t4.ftcdn.net/eed7dce7c540a9223bf6612b54d1200f48d0d720.jpg" alt="Punchi Battle" class="logo-img">
+            <img src="assets/favicon.svg" alt="Punchi Battle" class="logo-img" width="52" height="52">
             <div class="logo-text">
                 <h1>Punchi Battle</h1>
                 <span>L'Arène des Mots</span>
@@ -1309,6 +1323,7 @@
             </div>
 
             <div class="profile-header">
+                <p class="demo-data-note" role="note" style="grid-column:1/-1;padding:.7rem 1rem;border:1px solid rgba(255,215,0,.3);border-radius:10px;color:#ffe79a;background:rgba(255,215,0,.08)">Profil de démonstration : les statistiques et performances affichées sont fictives.</p>
                 <img src="https://api.dicebear.com/7.x/initials/svg?seed=Morgan" alt="Morgan" class="profile-avatar-large">
                 <div class="profile-info">
                     <h2>Morgan</h2>
@@ -1376,7 +1391,7 @@
                     </div>
                     <div class="comment">
                         <div class="comment-author">Règle 3 — Le Vote</div>
-                        <div class="comment-text">Chaque utilisateur peut voter une fois par punchline. Les votes sont anonymes et définitifs. Le battle dure 24h, le gagnant est celui avec le plus de votes.</div>
+                        <div class="comment-text">Un compte peut conserver un seul vote actif par punchline. Dans la version de démonstration, le vote peut être retiré. En production, les durées de battle et les résultats seront calculés côté serveur.</div>
                     </div>
                     <div class="comment">
                         <div class="comment-author">Règle 4 — Le Classement</div>
