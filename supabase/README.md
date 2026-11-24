@@ -41,6 +41,10 @@ Le projet Supabase `punchi-battle` se trouve dans `Specimens Org`, région `eu-w
 
 Les vérifications SQL confirment actuellement que `anon` ne peut effectuer aucune opération SELECT/INSERT/UPDATE/DELETE sur les huit tables. Les conseillers Supabase ne remontent aucune alerte de sécurité ou de santé. Les alertes performance restantes concernent des index non encore utilisés sur une base vide.
 
+## SMS Congo et international
+
+Le formulaire accepte les numéros E.164, avec le Congo (+242) en premier et une saisie internationale libre. Le projet ne possède encore aucun fournisseur SMS configuré. Twilio affiche actuellement 0,3371 USD par segment SMS sortant vers le Congo et des règles d’expéditeur particulières ; Vonage publie également des restrictions Sender ID sur MTN. Aucun abonnement n’a été lancé. Voir [guide SMS](CONFIGURATION.md) et ne pas activer avant un test +242 sur MTN/Airtel et un accord sur les coûts.
+
 ## État de l’interface
 
 Les menus Battles, Classement et Mon profil sont verrouillés avant connexion et acceptation de la politique. La démonstration locale est conservée séparément et clairement identifiée.
@@ -85,6 +89,7 @@ Le notebook SQL [Punchi Battle — audit continu](https://supabase.com/dashboard
 - `migrations/20261124132500_add_member_leaderboard_rank.sql` — rang global réel, même au-delà du Top 50.
 - `seed.sql` — six thèmes inactifs.
 - `../supabase.js` — client navigateur épinglé à `@supabase/supabase-js@2.119.2`.
+- `database.types.ts` — types TypeScript générés depuis le schéma live.
 - `database.types.ts` — types TypeScript générés du schéma live (à régénérer après chaque migration).
 - `CONFIGURATION.md` — réglages Auth/SMTP/SMS.
 - `../politique-confidentialite.html` — notice provisoire à compléter.
