@@ -16,6 +16,7 @@ CONTACT_MIGRATION = ROOT / "supabase/migrations/20261124122000_private_contact_d
 CONSENT_MIGRATION = ROOT / "supabase/migrations/20261124130000_record_privacy_consent.sql"
 MEMBER_CONSENT_MIGRATION = ROOT / "supabase/migrations/20261124131000_require_current_member_consent.sql"
 ANON_PRIVILEGES_MIGRATION = ROOT / "supabase/migrations/20261124131500_revoke_inherited_anon_privileges.sql"
+LEADERBOARD_MIGRATION = ROOT / "supabase/migrations/20261124132000_member_leaderboard_view.sql"
 SEED = ROOT / "supabase/seed.sql"
 
 TABLES = ("profiles", "themes", "entries", "votes", "comments", "reports")
@@ -63,6 +64,7 @@ def main() -> int:
     consents = read_required(CONSENT_MIGRATION, "migration du registre de consentement", errors)
     member_consent = read_required(MEMBER_CONSENT_MIGRATION, "migration de consentement obligatoire", errors)
     anon_privileges = read_required(ANON_PRIVILEGES_MIGRATION, "migration de révocation des privilèges anonymes", errors)
+    leaderboard = read_required(LEADERBOARD_MIGRATION, "migration du classement membre", errors)
     seed = read_required(SEED, "catalogue seed SQL", errors)
 
     for table in TABLES:
@@ -190,6 +192,15 @@ def main() -> int:
 
     if "create view public.entry_vote_totals" in hardening:
         errors.append("vue publique privilégiée de votes toujours présente")
+
+    require_fragments(leaderboard, (
+        "create or replace view public.member_leaderboard",
+        "with (security_invoker = true)",
+        "e.status = 'published'",
+        "sum(e.vote_count)",
+        "revoke all on public.member_leaderboard from public, anon, authenticated",
+        "grant select on public.member_leaderboard to authenticated",
+    ), "classement calculé avec RLS", errors)
 
     if "is_active)\nvalues" not in seed or ", false)" not in seed:
         errors.append("les thèmes de départ doivent rester inactifs par défaut")
