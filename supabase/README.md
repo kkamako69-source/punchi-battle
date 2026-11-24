@@ -8,7 +8,7 @@ Le projet Supabase `punchi-battle` a été créé dans `Specimens Org`, région 
 - API : https://ppuhpuuuxohokuzfctpq.supabase.co
 - État observé : `ACTIVE_HEALTHY`
 - PostgreSQL : version 17.12
-- Migrations appliquées : schéma initial, index supplémentaires, privilèges/anti-spam et compteur privé des votes.
+- Migrations appliquées : schéma initial, index supplémentaires, privilèges/anti-spam, compteur privé des votes et verrouillage anti-concurrence.
 - 6 tables publiques avec RLS ; 16 policies ; 6 thèmes initiaux, tous inactifs.
 - Aucun profil ni contenu utilisateur réel n’a été créé dans la base lors de cette revue.
 
@@ -21,7 +21,7 @@ Le projet Supabase `punchi-battle` a été créé dans `Specimens Org`, région 
 - Un seul vote est permis par compte et par punchline grâce à une contrainte unique.
 - Les lignes de votes ne sont lisibles que par leur votant. Le total public est une colonne agrégée `entries.vote_count`, mise à jour par un déclencheur privé. Aucune vue publique privilégiée ne contourne RLS.
 - Un helper `SECURITY DEFINER` est utilisé uniquement dans le schéma non exposé `private`, avec `search_path` vide, vérification de `auth.uid()` et droits d’exécution révoqués pour `PUBLIC`, `anon` et `authenticated`.
-- Limites de publication côté base : 5 punchlines par compte sur 24 heures et 20 commentaires par heure. Les dates de création sont définies par PostgreSQL.
+- Limites de publication côté base : 5 punchlines par compte sur 24 heures et 20 commentaires par heure. Un verrou transactionnel par compte et type de contenu sérialise les contrôles de limite pour résister aux envois simultanés. Les dates de création sont définies par PostgreSQL.
 
 Après la dernière migration, les conseillers Supabase ne signalent aucune alerte de sécurité ni de santé. Les seules alertes performance restantes sont des index non encore utilisés sur une base vide ; elles sont informatives, pas des échecs.
 
@@ -52,6 +52,7 @@ Un notebook SQL en lecture seule est disponible dans le projet Supabase : [Punch
 - `migrations/20261124095000_add_fk_owner_indexes.sql` — index supplémentaires.
 - `migrations/20261124121800_harden_write_paths_and_vote_totals.sql` — droits d’insertion limités et limites anti-spam.
 - `migrations/20261124122000_replace_vote_view_with_private_counter.sql` — compteur de votes privé.
+- `migrations/20261124123000_serialize_rate_limits.sql` — verrou transactionnel des limites anti-spam.
 - `seed.sql` — thèmes de démarrage désactivés.
 - `../supabase.js` — client navigateur épinglé à `@supabase/supabase-js@2.119.2`.
 - `CONFIGURATION.md` — réglages de lancement dans Supabase.
