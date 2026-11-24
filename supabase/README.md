@@ -33,6 +33,10 @@ La page `index.html` dispose maintenant d’un espace en ligne : inscription/con
 
 Les six thèmes restent inactifs. Cela empêche les soumissions avant que la modération et l’organisation soient prêtes. Le site affiche donc « aucun thème ouvert » jusqu’à l’activation volontaire d’un thème dans le tableau de bord.
 
+## Audit réutilisable
+
+Un notebook SQL en lecture seule est disponible dans le projet Supabase : [Punchi Battle — audit continu](https://supabase.com/dashboard/project/ppuhpuuuxohokuzfctpq/explorer/notebook/409399d0-c7c0-4b40-a58c-7fa04c74025d). Il regroupe les contrôles RLS, les politiques, les volumes, les thèmes, les privilèges d’insertion et la cohérence des compteurs de votes.
+
 ## Tests à effectuer avant lancement
 
 1. Configurer URL du site, URL de redirection et SMTP.
