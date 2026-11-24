@@ -85,5 +85,6 @@ Le notebook SQL [Punchi Battle — audit continu](https://supabase.com/dashboard
 - `migrations/20261124132500_add_member_leaderboard_rank.sql` — rang global réel, même au-delà du Top 50.
 - `seed.sql` — six thèmes inactifs.
 - `../supabase.js` — client navigateur épinglé à `@supabase/supabase-js@2.119.2`.
+- `database.types.ts` — types TypeScript générés du schéma live (à régénérer après chaque migration).
 - `CONFIGURATION.md` — réglages Auth/SMTP/SMS.
 - `../politique-confidentialite.html` — notice provisoire à compléter.
