@@ -1309,8 +1309,22 @@
           <input id="pb-cloud-phone-username" type="text" autocomplete="nickname" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" required>
         </div>
         <div class="pb-cloud-field">
-          <label for="pb-cloud-phone-number">Numéro de téléphone international</label>
-          <input id="pb-cloud-phone-number" type="tel" autocomplete="tel" inputmode="tel" placeholder="+242XXXXXXXXX ou +33XXXXXXXXX" maxlength="16" required>
+          <label for="pb-cloud-phone-country">Pays / indicatif (Congo en premier)</label>
+          <select id="pb-cloud-phone-country" autocomplete="country">
+            <option value="+242" selected>🇨🇬 République du Congo (+242)</option>
+            <option value="+243">🇨🇩 République démocratique du Congo (+243)</option>
+            <option value="+241">🇬🇦 Gabon (+241)</option>
+            <option value="+237">🇨🇲 Cameroun (+237)</option>
+            <option value="+225">🇨🇮 Côte d’Ivoire (+225)</option>
+            <option value="+221">🇸🇳 Sénégal (+221)</option>
+            <option value="+33">🇫🇷 France (+33)</option>
+            <option value="+32">🇧🇪 Belgique (+32)</option>
+            <option value="+44">🇬🇧 Royaume-Uni (+44)</option>
+            <option value="+1">🇺🇸 / 🇨🇦 États-Unis / Canada (+1)</option>
+            <option value="">Autre pays — numéro complet avec +</option>
+          </select>
+          <label for="pb-cloud-phone-number">Numéro de téléphone</label>
+          <input id="pb-cloud-phone-number" type="tel" autocomplete="tel" inputmode="tel" placeholder="06 123 45 67 ou +33 6 12 34 56 78" maxlength="24" required>
         </div>
         <label class="pb-contact-consent">
           <input id="pb-cloud-phone-privacy-consent" type="checkbox" required>
