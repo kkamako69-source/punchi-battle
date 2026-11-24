@@ -1276,6 +1276,7 @@
             <input id="pb-cloud-login-password" type="password" autocomplete="current-password" required minlength="12">
           </div>
           <button class="pb-cloud-button" type="submit">Entrer dans l’arène</button>
+          <button class="pb-cloud-small-button" id="pb-cloud-forgot-password" type="button" style="width:100%;margin-top:.55rem">Mot de passe oublié ?</button>
         </form>
 
         <form class="pb-cloud-card" id="pb-cloud-signup">
@@ -1300,13 +1301,40 @@
         </form>
       </div>
 
+      <form id="pb-cloud-recovery-request" class="pb-cloud-card" style="margin-top:1rem" hidden>
+        <h3>Récupérer mon accès e-mail</h3>
+        <p class="pb-cloud-privacy-note">Un lien temporaire sera envoyé à ton adresse. Cette fonction dépend de la configuration SMTP du projet.</p>
+        <div class="pb-cloud-field">
+          <label for="pb-cloud-recovery-email">Adresse e-mail du compte</label>
+          <input id="pb-cloud-recovery-email" type="email" autocomplete="email" maxlength="254" required>
+        </div>
+        <button class="pb-cloud-button" type="submit">Envoyer le lien sécurisé</button>
+        <button class="pb-cloud-small-button" id="pb-cloud-recovery-cancel" type="button" style="width:100%;margin-top:.55rem">Retour à la connexion</button>
+        <p class="pb-cloud-message" id="pb-cloud-recovery-request-message" role="status" aria-live="polite" hidden></p>
+      </form>
+
+      <form id="pb-cloud-password-update" class="pb-cloud-card" style="margin-top:1rem" hidden>
+        <h3>Définir un nouveau mot de passe</h3>
+        <p class="pb-cloud-privacy-note">Choisis un mot de passe unique d’au moins 12 caractères. Ne le partage avec personne.</p>
+        <div class="pb-cloud-field">
+          <label for="pb-cloud-new-password">Nouveau mot de passe</label>
+          <input id="pb-cloud-new-password" type="password" autocomplete="new-password" minlength="12" required>
+        </div>
+        <div class="pb-cloud-field">
+          <label for="pb-cloud-confirm-password">Confirmer le mot de passe</label>
+          <input id="pb-cloud-confirm-password" type="password" autocomplete="new-password" minlength="12" required>
+        </div>
+        <button class="pb-cloud-button" type="submit">Enregistrer le nouveau mot de passe</button>
+        <p class="pb-cloud-message" id="pb-cloud-password-update-message" role="status" aria-live="polite" hidden></p>
+      </form>
+
       <div id="pb-cloud-phone-auth-area">
       <form class="pb-cloud-card" id="pb-cloud-phone-form" style="margin-top:1rem">
         <h3>Accès par téléphone · Congo et international</h3>
         <p class="pb-cloud-privacy-note">Crée ton compte ou connecte-toi par code SMS. Saisis ton numéro au format international : +242…, +243…, +33…, etc. Le code pays n’est pas limité au Congo.</p>
         <div class="pb-cloud-field">
-          <label for="pb-cloud-phone-username">Nom de guerrier</label>
-          <input id="pb-cloud-phone-username" type="text" autocomplete="nickname" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" required>
+          <label for="pb-cloud-phone-username">Nom de guerrier (facultatif à la connexion)</label>
+          <input id="pb-cloud-phone-username" type="text" autocomplete="nickname" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" placeholder="Laisse vide si tu as déjà un compte">
         </div>
         <div class="pb-cloud-field">
           <label for="pb-cloud-phone-country">Pays / indicatif (Congo en premier)</label>
@@ -1437,6 +1465,25 @@
           <div><strong id="pb-cloud-profile-rank">Non classé</strong><span>Position</span></div>
           <div><strong id="pb-cloud-profile-joined">—</strong><span>Membre depuis</span></div>
         </div>
+        <section class="pb-cloud-card" style="margin-bottom:1rem">
+          <h3 class="pb-cloud-section-title">Modifier mon profil</h3>
+          <form id="pb-cloud-profile-form">
+            <div class="pb-cloud-field">
+              <label for="pb-cloud-profile-username">Nom d’utilisateur</label>
+              <input id="pb-cloud-profile-username" type="text" minlength="3" maxlength="24" pattern="[a-z0-9_]{3,24}" autocomplete="username" required>
+            </div>
+            <div class="pb-cloud-field">
+              <label for="pb-cloud-profile-display-name">Nom d’affichage</label>
+              <input id="pb-cloud-profile-display-name" type="text" minlength="2" maxlength="60" required>
+            </div>
+            <div class="pb-cloud-field">
+              <label for="pb-cloud-profile-bio">Biographie (facultatif, 280 caractères maximum)</label>
+              <textarea id="pb-cloud-profile-bio" rows="3" maxlength="280"></textarea>
+            </div>
+            <button class="pb-cloud-button" type="submit">Enregistrer mon profil</button>
+            <p class="pb-cloud-message" id="pb-cloud-profile-message" role="status" aria-live="polite" hidden></p>
+          </form>
+        </section>
 <section class="pb-contact-panel" aria-labelledby="pb-contact-heading">
     <h3 id="pb-contact-heading">Coordonnées privées du compte</h3>
     <p class="pb-cloud-privacy-note">Ton identifiant principal est géré par Supabase Auth. Les coordonnées secondaires ci-dessous sont enregistrées dans une table privée, accessibles uniquement à ton compte. Elles ne figurent jamais sur ton profil public et ne servent pas à la publicité.</p>
