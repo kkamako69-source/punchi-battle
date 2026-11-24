@@ -36,10 +36,13 @@ const phoneCodePanel = $("pb-cloud-phone-code-panel");
 const phoneVerifyForm = $("pb-cloud-phone-verify");
 const contactForm = $("pb-cloud-contact-form");
 const contactMessage = $("pb-cloud-contact-message");
+const accountConsentForm = $("pb-cloud-existing-consent");
+const PRIVACY_POLICY_VERSION = "PB-PRIVACY-2026-11-V1";
 
 let currentUser = null;
 let currentProfile = null;
 let currentContacts = null;
+let privacyAccepted = false;
 let profileReady = false;
 let pendingPhone = "";
 let activeThemes = [];
@@ -183,16 +186,18 @@ async function loadPrivateContacts() {
 }
 
 function renderSession() {
-  const isSignedIn = Boolean(currentUser && profileReady);
-  authForms.hidden = isSignedIn;
-  phoneAuthArea.hidden = isSignedIn;
-  accountPanel.hidden = !isSignedIn;
+  const hasSession = Boolean(currentUser);
+  const isSignedIn = Boolean(currentUser && privacyAccepted && profileReady);
+  authForms.hidden = hasSession;
+  phoneAuthArea.hidden = hasSession;
+  accountPanel.hidden = !hasSession;
+  accountConsentForm.hidden = !hasSession || privacyAccepted;
   $("pb-cloud-user").textContent = isSignedIn
-    ? (currentProfile?.display_name || currentProfile?.username || currentUser.email || "Membre")
+    ? (currentProfile?.display_name || currentProfile?.username || currentUser.email || currentUser.phone || "Membre")
     : "";
-  $("pb-cloud-user-handle").textContent = isSignedIn && currentProfile?.username
+  $("pb-cloud-user-handle").textContent = currentProfile?.username
     ? "@" + currentProfile.username
-    : "";
+    : (currentUser?.email || currentUser?.phone || "Compte connecté");
   $("pb-cloud-entry-panel").hidden = !isSignedIn || activeThemes.length === 0;
   $("pb-cloud-login-note").hidden = isSignedIn;
   if (memberContent) memberContent.hidden = !isSignedIn;
@@ -332,27 +337,63 @@ async function loadCloudData() {
   }
 }
 
+async function recordPrivacyConsent(user) {
+  const metadata = user?.user_metadata || {};
+  if (metadata.pb_privacy_version !== PRIVACY_POLICY_VERSION || metadata.pb_privacy_accepted !== true) {
+    return false;
+  }
+
+  const { data: existing, error: readError } = await supabase
+    .from("account_consents")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("consent_code", "privacy_policy")
+    .eq("policy_version", PRIVACY_POLICY_VERSION)
+    .maybeSingle();
+
+  if (readError) throw readError;
+  if (existing) return true;
+
+  const { error: insertError } = await supabase
+    .from("account_consents")
+    .insert({
+      user_id: user.id,
+      consent_code: "privacy_policy",
+      policy_version: PRIVACY_POLICY_VERSION
+    });
+
+  if (insertError && insertError.code !== "23505") throw insertError;
+  return true;
+}
+
 async function syncSession(session) {
   currentUser = session?.user ?? null;
   currentProfile = null;
   currentContacts = null;
+  privacyAccepted = false;
   profileReady = false;
   renderSession();
 
   if (currentUser) {
     try {
-      await ensureProfile(currentUser);
-      await loadPrivateContacts();
-      profileReady = true;
+      privacyAccepted = await recordPrivacyConsent(currentUser);
+      if (privacyAccepted) {
+        await ensureProfile(currentUser);
+        await loadPrivateContacts();
+        profileReady = true;
+      } else {
+        setMessage(authMessage, "Avant d’ouvrir les menus, lis et accepte la politique de confidentialité mise à jour.", "info");
+      }
       renderSession();
     } catch (error) {
-      console.error("Profile initialization error:", error);
-      setMessage(authMessage, "Ton compte est reconnu, mais la préparation du profil a échoué : " + (error.message || "erreur inconnue"), "error");
+      console.error("Account setup error:", error);
+      setMessage(authMessage, "La préparation sécurisée du compte a échoué : " + (error.message || "erreur inconnue"), "error");
     }
   } else {
     phoneCodePanel.hidden = true;
     pendingPhone = "";
     if (contactForm) contactForm.reset();
+    if (accountConsentForm) accountConsentForm.reset();
   }
 
   await loadCloudData();
@@ -386,6 +427,10 @@ signupForm.addEventListener("submit", async (event) => {
   const password = $("pb-cloud-signup-password").value;
   const button = signupForm.querySelector("button[type=submit]");
 
+  if (!$("pb-cloud-privacy-consent").checked) {
+    setMessage(authMessage, "Lis la politique de confidentialité et accepte-la pour créer ton compte.", "error");
+    return;
+  }
   if (password.length < 12) {
     setMessage(authMessage, "Utilise un mot de passe d’au moins 12 caractères.", "error");
     return;
@@ -398,7 +443,12 @@ signupForm.addEventListener("submit", async (event) => {
       email,
       password,
       options: {
-        data: { username, display_name: usernameRaw.slice(0, 60) },
+        data: {
+          username,
+          display_name: usernameRaw.slice(0, 60),
+          pb_privacy_version: PRIVACY_POLICY_VERSION,
+          pb_privacy_accepted: true
+        },
         emailRedirectTo: redirectUrl()
       }
     });
@@ -412,6 +462,33 @@ signupForm.addEventListener("submit", async (event) => {
     signupForm.reset();
   } catch (error) {
     setMessage(authMessage, error.message || "Inscription impossible.", "error");
+  } finally {
+    button.disabled = false;
+  }
+});
+
+accountConsentForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!$("pb-cloud-existing-consent-checkbox").checked) {
+    setMessage(authMessage, "Coche la case pour accepter la politique de confidentialité et déverrouiller tes menus.", "error");
+    return;
+  }
+
+  const button = accountConsentForm.querySelector("button[type=submit]");
+  button.disabled = true;
+  setMessage(authMessage, "Enregistrement de ton consentement…", "info");
+  try {
+    const { data, error } = await supabase.auth.updateUser({
+      data: {
+        pb_privacy_version: PRIVACY_POLICY_VERSION,
+        pb_privacy_accepted: true
+      }
+    });
+    if (error) throw error;
+    await syncSession({ user: data.user });
+    setMessage(authMessage, "Notice acceptée. Ton espace membre est maintenant accessible.", "success");
+  } catch (error) {
+    setMessage(authMessage, error.message || "Impossible d’enregistrer ton consentement.", "error");
   } finally {
     button.disabled = false;
   }
@@ -432,6 +509,10 @@ phoneAuthForm.addEventListener("submit", async (event) => {
     setMessage(authMessage, "Saisis ton numéro au format international E.164, par exemple +242XXXXXXXXX ou +33XXXXXXXXX.", "error");
     return;
   }
+  if (!$("pb-cloud-phone-privacy-consent").checked) {
+    setMessage(authMessage, "Lis la politique de confidentialité et accepte-la avant de recevoir un code SMS.", "error");
+    return;
+  }
 
   button.disabled = true;
   setMessage(authMessage, "Envoi du code SMS sécurisé…", "info");
@@ -440,7 +521,12 @@ phoneAuthForm.addEventListener("submit", async (event) => {
       phone,
       options: {
         shouldCreateUser: true,
-        data: { username, display_name: usernameRaw.slice(0, 60) }
+        data: {
+          username,
+          display_name: usernameRaw.slice(0, 60),
+          pb_privacy_version: PRIVACY_POLICY_VERSION,
+          pb_privacy_accepted: true
+        }
       }
     });
     if (error) throw error;
