@@ -12,7 +12,7 @@ create table if not exists public.profiles (
         check (char_length(display_name) <= 60),
     bio text not null default ''
         check (char_length(bio) <= 280),
-    avatar_url text,
+    avatar_url text check (avatar_url is null or (char_length(avatar_url) <= 2048 and avatar_url ~ '^https://')),
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
@@ -98,6 +98,9 @@ drop trigger if exists entries_set_updated_at on public.entries;
 create trigger entries_set_updated_at
 before update on public.entries
 for each row execute function public.set_updated_at();
+
+-- Trigger helper is not an RPC endpoint; only triggers need to invoke it.
+revoke all on function public.set_updated_at() from public, anon, authenticated;
 
 -- Profiles are created by the signed-in client after sign-up / first sign-in.
 -- The self-insert policy below binds the row to auth.uid(); no privileged signup trigger is exposed.
@@ -235,11 +238,13 @@ with check (
 -- Minimum client privileges. RLS policies remain the authorization boundary.
 grant usage on schema public to anon, authenticated;
 grant select on public.profiles, public.themes, public.entries, public.comments to anon, authenticated;
+grant insert on public.profiles to authenticated;
 grant update (username, display_name, bio, avatar_url) on public.profiles to authenticated;
 grant insert on public.entries to authenticated;
 grant update (body, theme_id) on public.entries to authenticated;
 grant delete on public.entries to authenticated;
 grant select, insert, delete on public.votes to authenticated;
 grant insert on public.comments to authenticated;
+grant select, insert on public.reports to authenticated;
 
 commit;
