@@ -30,6 +30,7 @@ const entriesNode = $("pb-cloud-entries");
 const pendingNode = $("pb-cloud-pending");
 const themeSelect = $("pb-cloud-theme");
 const memberContent = $("pb-cloud-member-content");
+const phoneAuthArea = $("pb-cloud-phone-auth-area");
 const phoneAuthForm = $("pb-cloud-phone-form");
 const phoneCodePanel = $("pb-cloud-phone-code-panel");
 const phoneVerifyForm = $("pb-cloud-phone-verify");
@@ -184,6 +185,7 @@ async function loadPrivateContacts() {
 function renderSession() {
   const isSignedIn = Boolean(currentUser && profileReady);
   authForms.hidden = isSignedIn;
+  phoneAuthArea.hidden = isSignedIn;
   accountPanel.hidden = !isSignedIn;
   $("pb-cloud-user").textContent = isSignedIn
     ? (currentProfile?.display_name || currentProfile?.username || currentUser.email || "Membre")
