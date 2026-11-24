@@ -36,7 +36,7 @@ Voir [Configuration Supabase](supabase/CONFIGURATION.md) et [Politique de confid
 
 - `index.html` : shell membre, portail d’accès, menus Arène/Classement/Profil et notice de confidentialité.
 - `supabase.js` : client navigateur épinglé à `@supabase/supabase-js@2.119.2`, avec clé publishable uniquement.
-- `supabase/migrations/` : onze migrations SQL versionnées et appliquées au projet Supabase.
+- `supabase/migrations/` : douze migrations SQL versionnées et appliquées au projet Supabase.
 - `supabase/seed.sql` : six thèmes de départ désactivés.
 - `supabase/README.md` : architecture réelle, sécurité, privilèges et état.
 - `supabase/CONFIGURATION.md` : URL Auth, e-mail, SMS, CAPTCHA, modération et lancement.
