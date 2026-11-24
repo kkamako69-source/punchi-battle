@@ -19,20 +19,37 @@ def fail(message: str) -> None:
 class FormNestingChecker(HTMLParser):
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
-        self.form_open = False
+        self.form_depth = 0
+        self.div_depth = 0
         self.errors: list[str] = []
 
     def handle_starttag(self, tag: str, attrs) -> None:
-        if tag.lower() == "form":
-            if self.form_open:
+        normalized = tag.lower()
+        if normalized == "form":
+            self.form_depth += 1
+            if self.form_depth > 1:
                 self.errors.append("formulaire HTML imbriqué détecté")
-            self.form_open = True
+        elif normalized == "div":
+            self.div_depth += 1
 
     def handle_endtag(self, tag: str) -> None:
-        if tag.lower() == "form":
-            if not self.form_open:
+        normalized = tag.lower()
+        if normalized == "form":
+            if self.form_depth <= 0:
                 self.errors.append("balise de fermeture de formulaire inattendue")
-            self.form_open = False
+            else:
+                self.form_depth -= 1
+        elif normalized == "div":
+            if self.div_depth <= 0:
+                self.errors.append("balise de fermeture div inattendue")
+            else:
+                self.div_depth -= 1
+
+    def finish(self) -> None:
+        if self.form_depth:
+            self.errors.append("formulaire HTML non fermé")
+        if self.div_depth:
+            self.errors.append("balise div non fermée")
 
 
 def main() -> int:
@@ -118,8 +135,7 @@ def main() -> int:
 
     form_checker = FormNestingChecker()
     form_checker.feed(html)
-    if form_checker.form_open:
-        form_checker.errors.append("formulaire HTML non fermé")
+    form_checker.finish()
     errors.extend(form_checker.errors)
 
     if not (ROOT / "politique-confidentialite.html").is_file():
