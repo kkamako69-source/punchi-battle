@@ -89,6 +89,31 @@ def main() -> int:
         errors.append("renouvellement du consentement pour les comptes existants manquant")
     if "politique-confidentialite.html" not in html:
         errors.append("lien vers la politique de confidentialité absent")
+    for required in (
+        'id="pb-cloud-member-nav"',
+        'data-pb-view="arena"',
+        'data-pb-view="ranking"',
+        'data-pb-view="profile"',
+        'id="pb-cloud-view-arena"',
+        'id="pb-cloud-view-ranking"',
+        'id="pb-cloud-view-profile"',
+        'id="pb-cloud-leaderboard"',
+        'id="pb-cloud-profile-submissions"',
+    ):
+        if required not in html:
+            errors.append(f"menu membre / écran distinct manquant : {required}")
+
+    if '.from("member_leaderboard")' not in client or "function renderCloudLeaderboard" not in client:
+        errors.append("classement non relié à la vue PostgreSQL membre")
+    if "data-pb-view-panel" not in html or "function showMemberView" not in client:
+        errors.append("navigation réelle entre les écrans membre manquante")
+    if "body > header, body > main, body > footer { display:none !important; }" not in html.replace(" ", ""):
+        # Keep the legacy static showcase out of the signed-in production shell.
+        compact = re.sub(r"\s+", "", html)
+        if "body>header,body>main,body>footer{display:none!important;}" not in compact:
+            errors.append("ancienne interface fictive visible dans le shell membre")
+    if "email || currentUser.phone" in client and "pb-contact-primary" in client:
+        pass
 
     form_checker = FormNestingChecker()
     form_checker.feed(html)
