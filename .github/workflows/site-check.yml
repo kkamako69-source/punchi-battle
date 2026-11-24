@@ -32,3 +32,5 @@ jobs:
         run: node --input-type=module --check < supabase.js
       - name: Check Supabase schema safeguards
         run: python tools/check_supabase_schema.py
+      - name: Check live Supabase frontend contract
+        run: python tools/check_punchi_frontend.py
