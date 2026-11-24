@@ -30,6 +30,8 @@ class FormNestingChecker(HTMLParser):
 
     def handle_endtag(self, tag: str) -> None:
         if tag.lower() == "form":
+            if not self.form_open:
+                self.errors.append("balise de fermeture de formulaire inattendue")
             self.form_open = False
 
 
@@ -90,7 +92,20 @@ def main() -> int:
 
     form_checker = FormNestingChecker()
     form_checker.feed(html)
+    if form_checker.form_open:
+        form_checker.errors.append("formulaire HTML non fermé")
     errors.extend(form_checker.errors)
+
+    if not (ROOT / "politique-confidentialite.html").is_file():
+        errors.append("page de politique de confidentialité manquante")
+    if "PRIVACY_POLICY_VERSION = \"PB-PRIVACY-2026-11-V1\"" not in client:
+        errors.append("version de politique de confidentialité non définie")
+    if "pb-cloud-member-content" not in html or "id=\"pb-cloud-member-content\" hidden" not in html:
+        errors.append("contenu des menus non masqué par défaut")
+    if "pb-cloud-phone-auth-area" not in html or "id=\"pb-cloud-phone-auth-area\"" not in html:
+        errors.append("zone de connexion téléphonique non isolée pour son masquage")
+    if "profile_contacts" in html:
+        errors.append("les coordonnées privées ne doivent pas être injectées comme données littérales dans le HTML")
 
     if errors:
         for error in errors:
