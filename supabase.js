@@ -251,7 +251,6 @@ async function loadCloudData() {
     statusNode.textContent = activeThemes.length
       ? "Arène en ligne · Les contenus affichés et les votes sont partagés."
       : "Base connectée · En attente de l’ouverture du premier thème par la modération.";
-    setMessage(authMessage, "", "info");
   } catch (error) {
     console.error("Punchi Battle cloud error:", error);
     statusNode.textContent = "Connexion à la base indisponible. La démonstration reste consultable plus bas.";
