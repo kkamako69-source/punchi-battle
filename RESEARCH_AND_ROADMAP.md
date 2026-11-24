@@ -1,6 +1,6 @@
 # Recherche technique et données — Punchi Battle
 
-Date de vérification : 21 novembre 2026.
+Dernière vérification documentaire : 24 novembre 2026.
 
 ## Choix recommandé pour le premier backend
 
@@ -48,8 +48,27 @@ Sources : https://huggingface.co/datasets/BantuLanguagesInitiative/LRSC · https
 
 ## Prochaines étapes
 
-1. Créer le projet Supabase et appliquer la migration SQL.
-2. Connecter un environnement de prévisualisation avec la seule clé publishable.
-3. Remplacer progressivement les données locales par des lectures/écritures Supabase.
-4. Tester chaque politique RLS avec un compte anonyme et deux comptes utilisateurs distincts.
-5. Ne basculer le domaine public qu'après tests d'authentification, modération et sauvegarde.
+1. Connecter un environnement de prévisualisation avec la seule clé publishable ; garder tout secret côté serveur.
+2. Créer un flux d’authentification email avec confirmation et redirections explicites.
+3. Remplacer progressivement les données locales par des lectures/écritures Supabase après tests RLS.
+4. Mettre en place la modération côté serveur avant de publier les participations en attente.
+5. Tester chaque politique avec un visiteur anonyme et deux comptes distincts, puis vérifier votes, retraits, signalements et permissions.
+6. Préparer les exports, le contrôle des quotas et la procédure de sauvegarde avant l’ouverture au public.
+
+## Catalogue musical et métadonnées : limites d'utilisation
+
+Les sources audio sous licence Creative Commons ne sont pas automatiquement utilisables dans des clips commerciaux, des publicités ou des morceaux publiés. Il faut vérifier la licence de chaque fichier et conserver sa provenance.
+
+- **MTG-Jamendo** : environ 55 000 pistes annotées avec des tags de style/ambiance. Les métadonnées sont CC BY-NC-SA 4.0 et l'ensemble est destiné à la recherche/non-commercial ; les enregistrements ont chacun leur licence. Ne pas l'utiliser comme banque sonore pour Smoke Party ou les clips monétisés sans autorisation écrite de Jamendo et validation des droits individuels.
+- **Free Music Archive (FMA)** : un pack HF annonce 106 199 morceaux/segments, 8 104 heures et environ 593 GB. Les métadonnées du dataset sont CC BY 4.0 mais les pistes ont des licences variées. Le volume est trop élevé pour le prototype ; choisir seulement des fichiers individuels dont les licences permettent explicitement l'usage souhaité.
+- Ces catalogues peuvent aider la recherche, la classification et le prototypage d'outils ; ils ne sont pas des sources de paroles ou de punchlines.
+
+Sources candidates : https://mtg.github.io/mtg-jamendo-dataset/ · https://huggingface.co/datasets/benjamin-paine/free-music-archive-full
+
+## Évolution et maintenance
+
+- Préférer des métadonnées structurées sous CC0 (par exemple Wikidata) et un catalogue d'enregistrements avec licences individuelles.
+- Conserver sur chaque ressource : URL source, auteur, date de récupération, langue, licence, attribution et preuve de permission.
+- Dédupliquer les médias et mettre en cache les résultats côté serveur ; ne pas faire une requête API par visiteur.
+- Prévoir backoff/exponential retry, limites par IP/utilisateur et une file de modération.
+- Maintenir les jeux de test synthétiques distincts des créations et données personnelles des artistes.
