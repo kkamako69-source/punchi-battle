@@ -30,6 +30,8 @@ const entriesNode = $("pb-cloud-entries");
 const pendingNode = $("pb-cloud-pending");
 const themeSelect = $("pb-cloud-theme");
 const memberContent = $("pb-cloud-member-content");
+const memberNav = $("pb-cloud-member-nav");
+const leaderboardNode = $("pb-cloud-leaderboard");
 const phoneAuthArea = $("pb-cloud-phone-auth-area");
 const phoneAuthForm = $("pb-cloud-phone-form");
 const phoneCodePanel = $("pb-cloud-phone-code-panel");
@@ -143,21 +145,14 @@ function normalizeE164(value) {
 }
 
 function renderProtectedNavigation() {
-  const unlocked = Boolean(currentUser && profileReady);
+  const unlocked = Boolean(currentUser && privacyAccepted && profileReady);
   window.PunchiBattleAuth = { isAuthenticated: unlocked };
   document.body.classList.toggle("pb-authenticated", unlocked);
 
-  document.querySelectorAll(".nav-btn[data-auth-required='true']").forEach((button) => {
+  document.querySelectorAll(".pb-cloud-menu-button[data-pb-view]").forEach((button) => {
     button.setAttribute("aria-disabled", unlocked ? "false" : "true");
-    button.title = unlocked ? "" : "Inscris-toi ou connecte-toi pour ouvrir ce menu.";
+    button.title = unlocked ? "" : "Inscris-toi, connecte-toi et accepte la politique pour ouvrir ce menu.";
   });
-
-  if (!unlocked) {
-    const active = document.querySelector(".section-view.active");
-    if (active && active.id !== "section-home" && typeof window.navigateTo === "function") {
-      window.navigateTo("home");
-    }
-  }
 }
 
 async function loadPrivateContacts() {
@@ -201,6 +196,15 @@ function renderSession() {
   $("pb-cloud-entry-panel").hidden = !isSignedIn || activeThemes.length === 0;
   $("pb-cloud-login-note").hidden = isSignedIn;
   if (memberContent) memberContent.hidden = !isSignedIn;
+
+  if ($("pb-cloud-profile-name")) {
+    $("pb-cloud-profile-name").textContent =
+      currentProfile?.display_name || currentProfile?.username || "Ton nom de guerrier";
+    $("pb-cloud-profile-handle").textContent =
+      currentProfile?.username ? "@" + currentProfile.username : "";
+    $("pb-cloud-profile-primary").textContent =
+      isSignedIn ? (currentUser.email || currentUser.phone || "Identifiant de connexion géré par Supabase Auth") : "";
+  }
   renderProtectedNavigation();
 }
 
@@ -258,6 +262,54 @@ function renderEntries(entries) {
   }).join("");
 }
 
+function renderCloudLeaderboard(rows) {
+  if (!leaderboardNode) return;
+  if (!rows?.length) {
+    leaderboardNode.innerHTML = '<p class="pb-cloud-empty-state">Le classement apparaîtra lorsque les premières punchlines auront été publiées et votées.</p>';
+    return;
+  }
+
+  leaderboardNode.innerHTML = rows.map((row, index) => {
+    const rank = index + 1;
+    const name = row.display_name || row.username || "MC";
+    return '<article class="pb-cloud-rank">' +
+      '<div class="pb-cloud-rank-number">#' + rank + '</div>' +
+      '<div>' +
+        '<div class="pb-cloud-rank-name">' + escapeHTML(name) + '</div>' +
+        '<div class="pb-cloud-rank-sub">@' + escapeHTML(row.username || "mc") + ' · ' +
+          Number(row.submissions_count || 0).toLocaleString("fr-FR") + ' participations</div>' +
+      '</div>' +
+      '<div class="pb-cloud-rank-score">' +
+        Number(row.votes_total || 0).toLocaleString("fr-FR") + ' votes' +
+      '</div>' +
+    '</article>';
+  }).join("");
+}
+
+function showMemberView(view) {
+  if (!currentUser || !privacyAccepted || !profileReady) {
+    setMessage(authMessage, "Inscris-toi ou connecte-toi, puis accepte la politique de confidentialité pour accéder à ces menus.", "info");
+    $("pb-cloud").scrollIntoView({ behavior: "smooth", block: "start" });
+    const focusTarget = $("pb-cloud-signup-username") || $("pb-cloud-login-email");
+    if (focusTarget) focusTarget.focus({ preventScroll: true });
+    return false;
+  }
+
+  const permitted = new Set(["arena", "ranking", "profile"]);
+  if (!permitted.has(view)) return false;
+
+  activeMemberView = view;
+  document.querySelectorAll("[data-pb-view-panel]").forEach((panel) => {
+    panel.hidden = panel.id !== "pb-cloud-view-" + view;
+  });
+  document.querySelectorAll(".pb-cloud-menu-button[data-pb-view]").forEach((button) => {
+    const active = button.dataset.pbView === view;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-current", active ? "page" : "false");
+  });
+  return true;
+}
+
 async function loadCloudData() {
   if (loadingEntries) return;
   if (!currentUser || !profileReady) {
@@ -295,13 +347,22 @@ async function loadCloudData() {
 
     const { data: entries, error: entriesError } = await supabase
       .from("entries")
-      .select("id, body, vote_count, created_at, profiles!entries_author_id_fkey(username,display_name), themes!entries_theme_id_fkey(title)")
+      .select("id, author_id, body, vote_count, created_at, profiles!entries_author_id_fkey(username,display_name), themes!entries_theme_id_fkey(title)")
       .eq("status", "published")
       .order("created_at", { ascending: false })
       .limit(50);
 
     if (entriesError) throw entriesError;
     renderEntries(entries || []);
+
+    const { data: ranking, error: rankingError } = await supabase
+      .from("member_leaderboard")
+      .select("author_id, username, display_name, submissions_count, votes_total")
+      .order("votes_total", { ascending: false })
+      .order("submissions_count", { ascending: false })
+      .limit(50);
+    if (rankingError) throw rankingError;
+    renderCloudLeaderboard(ranking || []);
 
     if (currentUser) {
       const { data: pending, error: pendingError } = await supabase
@@ -397,6 +458,7 @@ async function syncSession(session) {
   }
 
   await loadCloudData();
+  if (profileReady) showMemberView(activeMemberView || "arena");
 }
 
 loginForm.addEventListener("submit", async (event) => {
@@ -723,6 +785,12 @@ entriesNode.addEventListener("click", async (event) => {
   } finally {
     button.disabled = false;
   }
+});
+
+memberNav.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-pb-view]");
+  if (!button) return;
+  showMemberView(button.dataset.pbView);
 });
 
 $("pb-cloud-refresh").addEventListener("click", () => {
