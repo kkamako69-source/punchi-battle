@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 import re
 import sys
+from collections import Counter
 from html.parser import HTMLParser
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -60,7 +61,11 @@ def main() -> int:
 
     html = HTML.read_text(encoding="utf-8")
     client = CLIENT.read_text(encoding="utf-8")
-    html_ids = set(re.findall(r'\bid=["\']([^"\']+)["\']', html))
+    all_html_ids = re.findall(r'\bid=["\']([^"\']+)["\']', html)
+    html_ids = set(all_html_ids)
+    duplicate_ids = sorted(key for key, count in Counter(all_html_ids).items() if count > 1)
+    if duplicate_ids:
+        errors.append("identifiants HTML en double : " + ", ".join(duplicate_ids))
     referenced_ids = set(re.findall(r'\$\(["\']([^"\']+)["\']\)', client))
     referenced_ids.update(re.findall(r'getElementById\(["\']([^"\']+)["\']\)', client))
 
@@ -146,6 +151,12 @@ def main() -> int:
         errors.append("contenu des menus non masqué par défaut")
     if "pb-cloud-phone-auth-area" not in html or "id=\"pb-cloud-phone-auth-area\"" not in html:
         errors.append("zone de connexion téléphonique non isolée pour son masquage")
+    if "pb-cloud-phone-auth-area" not in html or "id=\"pb-cloud-phone-auth-area\"" not in html:
+        errors.append("zone de connexion téléphonique non isolée pour son masquage")
+    if 'id="pb-cloud-phone-country"' not in html or 'value="+242" selected' not in html:
+        errors.append("indicatif Congo prioritaire dans l’inscription SMS manquant")
+    if "normalizeE164" not in client or "phone.startsWith(\"+\")" not in client:
+        errors.append("saisie internationale E.164 avec indicatif local manquante")
     if "profile_contacts" in html:
         errors.append("les coordonnées privées ne doivent pas être injectées comme données littérales dans le HTML")
 
