@@ -85,6 +85,19 @@ def main() -> int:
         errors.append("redirection de confirmation e-mail absente")
     if "password.length < 12" not in client:
         errors.append("contrôle minimal de longueur du mot de passe absent")
+    for required in ("resetPasswordForEmail", "PASSWORD_RECOVERY", 'updateUser({ password })'):
+        if required not in client:
+            errors.append(f"récupération du compte e-mail manquante : {required}")
+    if "pb-cloud-forgot-password" not in html or "pb-cloud-recovery-request" not in html:
+        errors.append("formulaire de demande de récupération absent")
+    if "pb-cloud-password-update" not in html or "pb-cloud-new-password" not in html:
+        errors.append("formulaire de définition du nouveau mot de passe absent")
+    if "pb-cloud-profile-form" not in html or "profiles" not in client or "profileForm.addEventListener" not in client:
+        errors.append("édition du profil membre manquante")
+    if "passwordRecoveryPending" not in client or "|| passwordRecoveryPending" not in client:
+        errors.append("verrouillage des menus pendant la récupération du compte manquant")
+    if 'id="pb-cloud-login-password" type="password" autocomplete="current-password" required>' not in html:
+        errors.append("connexion bloquée par une limite locale de longueur de mot de passe")
     for table in ("profiles", "themes", "entries", "votes"):
         if f'.from("{table}")' not in client:
             errors.append(f"table {table} non utilisée par le client")
