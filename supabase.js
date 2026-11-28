@@ -333,7 +333,7 @@ function showMemberView(view) {
 
 async function loadCloudData() {
   if (loadingEntries) return;
-  if (!currentUser || !profileReady) {
+  if (!currentUser || !profileReady || passwordRecoveryPending) {
     activeThemes = [];
     userVotes = new Set();
     renderThemes();
@@ -472,7 +472,12 @@ async function syncSession(session) {
   profileReady = false;
   renderSession();
 
-  if (currentUser) {
+  if (currentUser && passwordRecoveryPending) {
+    // The recovery screen must not load member menus or profile data.
+    privacyAccepted = false;
+    profileReady = false;
+    renderSession();
+  } else if (currentUser) {
     try {
       privacyAccepted = await recordPrivacyConsent(currentUser);
       if (privacyAccepted) {
