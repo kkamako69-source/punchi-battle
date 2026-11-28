@@ -16,7 +16,9 @@ Punchi Battle est une plateforme de battles de punchlines : un thème est ouvert
 
 **E-mail :** adresse + mot de passe (12 caractères minimum) + confirmation de l’adresse par e-mail.
 
-**Téléphone :** OTP SMS à six chiffres au format international E.164. Le Congo est prérempli comme pays de référence pour les coordonnées secondaires ; les indicatifs internationaux sont acceptés, sans restriction géographique.
+**Téléphone :** OTP SMS à six chiffres au format international E.164. Le Congo (+242) est prérempli, les indicatifs internationaux sont acceptés. Le pseudo est facultatif lors d’une connexion par téléphone à un compte existant.
+
+**Gestion du compte :** modification du pseudo/nom/biographie, récupération du mot de passe e-mail et renouvellement du consentement.
 
 **Coordonnées secondaires :** e-mail et/ou téléphone facultatifs, conservés dans `profile_contacts`, visibles uniquement par le membre propriétaire. Ces coordonnées secondaires ne sont pas vérifiées par le formulaire et ne constituent pas un moyen de récupération du compte.
 
