@@ -55,7 +55,15 @@ Références :
 - https://supabase.com/docs/guides/auth/auth-mfa/phone
 - https://www.itu.int/rec/T-REC-E.164
 
-## 4. Consentement et accès membre
+## 4. Récupération et gestion du compte
+
+- La connexion par e-mail accepte le mot de passe déjà défini par le membre ; la limite de 12 caractères s’applique à la création et au changement de mot de passe, pas à la connexion des anciens comptes.
+- « Mot de passe oublié ? » envoie un lien avec `resetPasswordForEmail`. Le chemin de redirection doit être autorisé dans **Authentication → URL Configuration** ; la page revient sur le même site avec le type de récupération dans le hash.
+- L’écran de nouveau mot de passe exige 12 caractères minimum et une confirmation identique.
+- Le profil permet au membre de modifier son pseudo, son nom d’affichage et sa biographie. Le pseudo reste unique.
+- La récupération de compte par téléphone n’utilise pas les coordonnées secondaires non vérifiées. Ne pas présenter ces champs comme un secours de compte.
+
+## 5. Consentement et accès membre
 
 La version courante est `PB-PRIVACY-2026-11-V1`. L’utilisateur doit l’accepter pendant l’inscription ou à sa prochaine connexion. La base enregistre cette acceptation dans `account_consents` ; les policies RLS vérifient ce registre avant l’accès aux données membre.
 
@@ -63,7 +71,7 @@ La notice [politique-confidentialite.html](../politique-confidentialite.html) es
 
 Le projet se trouve dans la région spécifique eu-west-3 (Paris). La région choisie détermine l’emplacement principal des données, mais ne constitue pas à elle seule une preuve de conformité et ne garantit pas que tout traitement opérationnel reste dans cette région. Le changement de région nécessite une migration vers un nouveau projet.
 
-## 5. Ouvrir un thème quand la modération est prête
+## 6. Ouvrir un thème quand la modération est prête
 
 Les six thèmes sont volontairement inactifs. Exemple à adapter dans SQL Editor, lorsque la battle est organisée :
 
@@ -77,11 +85,11 @@ where slug = 'la-trahison';
 
 Cette opération n’est pas exécutée par le site. Seul un responsable ayant les droits d’administration doit l’effectuer.
 
-## 6. Modération
+## 7. Modération
 
 Les nouvelles punchlines restent en `pending`. Le navigateur ne peut pas publier, masquer ou changer le statut. Une interface de modération protégée doit être créée avant un lancement plus large. En attendant, un responsable peut publier une participation précise depuis SQL Editor après vérification.
 
-## 7. Clés et secrets
+## 8. Clés et secrets
 
 - `supabase.js` contient uniquement l’URL du projet et une clé `sb_publishable_...`.
 - Ne jamais ajouter `sb_secret_...`, `service_role`, un jeton d’administration, mot de passe PostgreSQL ou secret SMTP/SMS au dépôt.
