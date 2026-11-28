@@ -102,6 +102,27 @@ def main() -> int:
         errors.append("édition du profil membre manquante")
     if "passwordRecoveryPending" not in client or "|| passwordRecoveryPending" not in client:
         errors.append("verrouillage des menus pendant la récupération du compte manquant")
+    for required in (
+        "resetPasswordForEmail",
+        "PASSWORD_RECOVERY",
+        'updateUser({ password })',
+        "pb-cloud-recovery-exit",
+        "profileForm.addEventListener",
+        '.from("profiles")',
+        "display_name: displayName",
+        "bio"
+    ):
+        if required not in client and required not in html:
+            errors.append(f"récupération e-mail / édition du profil incomplète : {required}")
+    if 'id="pb-cloud-forgot-password"' not in html:
+        errors.append("bouton Mot de passe oublié absent")
+    if 'id="pb-cloud-recovery-exit"' not in html:
+        errors.append("bouton de sortie du mode récupération absent")
+    if 'id="pb-cloud-profile-form"' not in html:
+        errors.append("formulaire de modification du profil absent")
+    if 'id="pb-cloud-login-password" type="password" autocomplete="current-password" required>' not in html:
+        errors.append("connexion historique des membres restreinte par longueur locale")
+
     if 'id="pb-cloud-login-password" type="password" autocomplete="current-password" required>' not in html:
         errors.append("connexion bloquée par une limite locale de longueur de mot de passe")
     for table in ("profiles", "themes", "entries", "votes"):
