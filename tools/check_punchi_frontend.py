@@ -92,6 +92,12 @@ def main() -> int:
         errors.append("formulaire de demande de récupération absent")
     if "pb-cloud-password-update" not in html or "pb-cloud-new-password" not in html:
         errors.append("formulaire de définition du nouveau mot de passe absent")
+    if "pb-cloud-recovery-exit" not in html or "supabase.auth.resetPasswordForEmail" not in client:
+        errors.append("sortie sûre et demande de récupération du mot de passe incomplètes")
+    if "supabase.auth.signOut()" not in client or "passwordRecoveryPending = false" not in client:
+        errors.append("fermeture de la session de récupération incomplète")
+    if 'id="pb-cloud-login-password" type="password" autocomplete="current-password" required>' not in html:
+        errors.append("connexion des anciens comptes limitée à la politique de nouveau mot de passe")
     if "pb-cloud-profile-form" not in html or "profiles" not in client or "profileForm.addEventListener" not in client:
         errors.append("édition du profil membre manquante")
     if "passwordRecoveryPending" not in client or "|| passwordRecoveryPending" not in client:
