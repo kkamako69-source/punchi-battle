@@ -541,6 +541,24 @@ recoveryRequestForm.addEventListener("submit", async (event) => {
   }
 });
 
+$("pb-cloud-recovery-exit").addEventListener("click", async () => {
+  const button = $("pb-cloud-recovery-exit");
+  button.disabled = true;
+  try {
+    // A recovery session is deliberately discarded if the member cancels the flow.
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+  } catch (error) {
+    setMessage(passwordRecoveryMessage, error.message || "Impossible de fermer la session de récupération.", "error");
+  } finally {
+    passwordRecoveryPending = false;
+    window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+    passwordRecoveryForm.reset();
+    button.disabled = false;
+    if (!currentUser) renderSession();
+  }
+});
+
 passwordRecoveryForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const password = $("pb-cloud-new-password").value;
