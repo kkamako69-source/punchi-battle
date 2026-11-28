@@ -20,6 +20,8 @@ Le projet Supabase `punchi-battle` se trouve dans `Specimens Org`, région `eu-w
 - La politique `PB-PRIVACY-2026-11-V1` doit être acceptée. L’acceptation est inscrite dans `account_consents` et enregistrée pour le compte connecté.
 - Les policies RLS vérifient l’existence du consentement courant avant de lire ou d’écrire les données membre. Les visiteurs anonymes n’ont aucun privilège de table sur les huit tables.
 - Les anciens comptes qui se connectent après un changement de politique voient un formulaire de renouvellement du consentement.
+- La récupération du mot de passe e-mail utilise le flux Auth de Supabase ; la redirection et les modèles d’e-mail doivent être configurés.
+- Le pseudo, le nom d’affichage et la biographie peuvent être modifiés dans le menu Profil. La connexion des anciens comptes ne bloque pas les mots de passe historiques de moins de 12 caractères.
 
 ## Coordonnées et confidentialité
 
